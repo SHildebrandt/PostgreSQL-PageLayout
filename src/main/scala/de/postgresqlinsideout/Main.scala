@@ -1,6 +1,5 @@
 package de.postgresqlinsideout
 
-import scala.slick.jdbc.meta.MBestRowIdentifierColumn.Scope.Session
 
 /**
  *
@@ -11,7 +10,6 @@ import scala.slick.jdbc.meta.MBestRowIdentifierColumn.Scope.Session
 object Main extends App {
 
   override def main(args: Array[String]) {
-    implicit val session = Session
     println(DBAccess.getPageHeader("authors", 0))
     println(DBAccess.getHeapPageItems("authors", 0))
   }
