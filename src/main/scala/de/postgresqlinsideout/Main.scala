@@ -12,7 +12,8 @@ object Main extends App {
 
   override def main(args: Array[String]) {
     implicit val session = Session
-    println(DBAccess.getPageHeader("customers", 0))
+    println(DBAccess.getPageHeader("authors", 0))
+    println(DBAccess.getHeapPageItems("authors", 0))
   }
 
 }
