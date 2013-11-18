@@ -31,9 +31,12 @@ object DBAccess {
     case _ => throw new Exception("Could not parse Int-Tuple: " + s)
   }
 
-  def getPageHeader(table: String, pageNo: Int): List[PageHeader] = {
+  def getPageHeader(table: String, pageNo: Int): PageHeader = {
     db withSession {
-      StaticQuery.queryNA[PageHeader](s"SELECT * FROM page_header(get_raw_page('$table', $pageNo))").list()
+      val result = StaticQuery.queryNA[PageHeader](s"SELECT * FROM page_header(get_raw_page('$table', $pageNo))").list()
+      if (result.size != 1)
+        throw new Exception("Unexpected result size of function page_header")
+      result(0)
     }
   }
 

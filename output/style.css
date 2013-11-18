@@ -1,0 +1,22 @@
+table {
+  border:3px solid black;
+  table-layout:fixed;
+}
+
+td {
+  border:1px solid black;
+  height:20px;
+  overflow:hidden;
+}
+
+td.empty {
+  background-color:gray;
+}
+
+td.data {
+  background-color:red;
+}
+
+td.header {
+  background-color:yellow;
+}
