@@ -1,4 +1,4 @@
-package de.postgresqlinsideout.html
+package de.postgresqlinsideout.pagelayout.representation
 
 /**
  * A trait providing basic constants for the layout of a @link{HtmlTable}
@@ -20,8 +20,7 @@ trait LayoutProperties {
 
   val style = s"""<link rel="stylesheet" type="text/css" href="style.css">
                  |<style type="text/css">
-                 |div { align:center; }
-                 |col { width:${COLUMN_WIDTH}px; }
+                 |  col.fixedWidth { width:${COLUMN_WIDTH}px; }
                  |</style>""".stripMargin
 
   val header = s"""<head>
@@ -30,13 +29,13 @@ trait LayoutProperties {
                   |</head>""".stripMargin
 
   val tableHead = {
-    val body = "<body><div align='center'>\n"
-    val table = "  <table>\n"
-    val cols = (1 to COLUMNS) map (_ => s"    <col />") mkString "\n"
+    val body = "<body>\n"
+    val table = "  <table class='center'>\n"
+    val cols = (1 to COLUMNS) map (_ => s"    <col class='fixedWidth'/>") mkString "\n"
     body + table + cols
   }
 
-  val tableEnd = "  </table></div>\n</body>"
+  val tableEnd = "  </table>\n</body>"
 
   val htmlEnd = "</html>"
 }

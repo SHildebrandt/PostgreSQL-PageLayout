@@ -1,4 +1,4 @@
-package de.postgresqlinsideout.data
+package de.postgresqlinsideout.pagelayout.data
 
 import scala.slick.session.Database
 import scala.slick.jdbc.{StaticQuery, GetResult}

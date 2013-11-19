@@ -1,8 +1,10 @@
 package de.postgresqlinsideout.pagelayout
 
 import java.io.File
-import de.postgresqlinsideout.html.{ContentType, TableItem, HtmlTable}
-import de.postgresqlinsideout.data.DBAccess
+import de.postgresqlinsideout.pagelayout.data.DBAccess
+import de.postgresqlinsideout.pagelayout.representation.PageItem
+import de.postgresqlinsideout.pagelayout.representation.HtmlTable
+import de.postgresqlinsideout.pagelayout.representation.ContentType._
 
 
 /**
@@ -15,14 +17,14 @@ object Main extends App {
     val heapPageItems = DBAccess.getHeapPageItems("authors", 0)
     val table = new HtmlTable()
 
-    import ContentType._
-    table.addItem(TableItem(2, 24, HEADER, "Test1"))
+    table.addItem(PageItem(0, 0, HEADER, "StartPos"))
+    table.addItem(PageItem(4, 24, HEADER, "Test1"))
     pageHeader.toTableItemList(64) foreach (table.addItem(_))
     //table.addItem(TableItem(28, 258, DATA, "Test2"))
-    table.addItem(TableItem(500, 501, HEADER, "TestHeader"))
-    table.addItem(TableItem(502, 503, DATA, "Data"))
-    table.addItem(TableItem(8010, 8191, DATA, "Data"))
-    table.printHTML5(new File("output/PageLayout.html"))
+    table.addItem(PageItem(500, 501, HEADER, "TestHeader"))
+    table.addItem(PageItem(502, 503, DATA, "Data"))
+    table.addItem(PageItem(8010, 8191, DATA, "Data"))
+    table.printToFile(new File("output/PageLayout.html"))
   }
 
 }

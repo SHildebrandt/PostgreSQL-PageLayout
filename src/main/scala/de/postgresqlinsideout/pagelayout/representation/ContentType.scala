@@ -1,4 +1,4 @@
-package de.postgresqlinsideout.html
+package de.postgresqlinsideout.pagelayout.representation
 
 /**
  * @author Steffen Hildebrandt

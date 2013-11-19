@@ -1,16 +1,18 @@
-package de.postgresqlinsideout.data
+package de.postgresqlinsideout.pagelayout.data
 
 /**
  * Representation of a heap page item in PostgreSQL
  * (as described in the PostgreSQL source code)
  *
  * @param lp
- * @param lpOff
- * @param lpFlags
- * @param lpLen
- * @param tXmin insert XID stamp
- * @param tXmax delete XID stamp
- * @param tField3
+ * @param lpOff offset to tuple (from start of page)
+ * @param lpFlags state of item pointer
+ * @param lpLen byte length of tuple
+ * @param tXmin inserting xact ID
+ * @param tXmax deleting or locking xact ID
+ * @param tField3 two fields:
+ *                - t_cid   inserting or deleting command ID, or both
+ *                - t_xvac  old-style VACUUM FULL xact ID
  * @param tCtid current TID of this or newer tuple
  * @param tInfomask2 number of attributes + various flags
  * @param tInfomask various flag bits
@@ -37,10 +39,10 @@ object HeapPageItem {
   def apply(lp: Int, lpOff: Int, lpFlags: Int, lpLen: Int, tXmin: Int, tXmax: Int, tField3: Int, tCtid: (Int, Int),
              tInfomask2: Int, tInfomask: Int, tHoff: Int, tBits: Int, tOid: Int) =
     new HeapPageItem(
-      new Field("lp", lp, 0),  // size ????
-      new Field("lpOff", lpOff, 0),
-      new Field("lpFlags", lpFlags, 0),
-      new Field("lpLen", lpLen, 0),
+      new Field("lp", lp, 0),  // size ??
+      new Field("lpOff", lpOff, 2),     // 15 bit
+      new Field("lpFlags", lpFlags, 0), //  2 bit
+      new Field("lpLen", lpLen, 2),     // 15 bit
       new Field("tXmin", tXmin, 4),
       new Field("tXmax", tXmax, 4),
       new Field("tField3", tField3, 4),

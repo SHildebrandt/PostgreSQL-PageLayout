@@ -1,35 +1,43 @@
-package de.postgresqlinsideout.html
+package de.postgresqlinsideout.pagelayout.representation
 
 import scala.collection.SortedSet
 import java.io.{PrintWriter, File}
-import ContentType._
+import de.postgresqlinsideout.pagelayout.representation.ContentType._
+
+/**
+ * Trait for a page representation.
+ * So far the only implementation is a HtmlTable.
+ *
+ * @author Steffen Hildebrandt
+ */
+trait PageRepresentation {
+  def addItem(item: PageItem)
+  def printToFile(to: File)
+}
 
 /**
  * A class providing utilities to illustrate the content of a PostgreSQL page
  *
  * @author Steffen Hildebrandt
  */
-class HtmlTable extends LayoutProperties {
+class HtmlTable extends PageRepresentation with LayoutProperties {
   import HtmlTable._
 
-  val tableItemOrdering = Ordering[Int].on[TableItem](t => t.firstByte)
-  private var contents = SortedSet[TableItem]()(tableItemOrdering)
+  val tableItemOrdering: Ordering[PageItem] = Ordering[Int].on[PageItem](t => t.firstByte)
+  private var contents = SortedSet[PageItem]()(tableItemOrdering)
 
-  def addItem(item: TableItem) = contents += item
+  override def addItem(item: PageItem) = contents += item
 
-  private def startPos(item: TableItem) = (item.firstByte / COLUMNS, item.firstByte % COLUMNS)
+  private def startPos(item: PageItem) = (item.firstByte / COLUMNS + 1, item.firstByte % COLUMNS + 1)
 
-  private def endPos(item: TableItem) = (item.lastByte / COLUMNS, item.lastByte % COLUMNS)
+  private def endPos(item: PageItem) = (item.lastByte / COLUMNS + 1, item.lastByte % COLUMNS + 1)
 
-  def printHTML5(file: File) = {
+  override def printToFile(file: File) = {
     val writer = new PrintWriter(file)
-    var currentRow = 0
-    var currentColumn = 0
+    var currentRow = 1
+    var currentColumn = 1
 
-    def tr(rowspan: Int = 1) = {
-      val rs = if (rowspan == 1) "" else s" rowspan=$rowspan"
-      writer.println(s"    <tr$rs>")
-    }
+    def tr = writer.println("    <tr>")
     def `/tr` = writer.println("    </tr>")
     def td(clazz: String = "default", colspan: Int = 1) = writer.print(s"      <td colspan=$colspan class='$clazz'>")
     def `/td` = writer.println("</td>")
@@ -44,12 +52,12 @@ class HtmlTable extends LayoutProperties {
 
     def cellUntil(column: Int, contentType: ContentType, content: String = "") = {
       if (column >= currentColumn) {
-        if (currentColumn == 0) tr()
+        if (currentColumn == 1) tr
         cell(column - currentColumn + 1, contentType, content)
       }
       if (column == COLUMNS) {
         `/tr`
-        currentColumn = 0
+        currentColumn = 1
         currentRow += 1
       }
     }
@@ -64,12 +72,14 @@ class HtmlTable extends LayoutProperties {
       val col = endPos._2
       if (row == currentRow)
         cellUntil(col, contentType, content)
-      else {
+      else if (row > currentRow) {
         // might want to optimize content position...
         val continuedString = if (content == "") "" else "..."
         cellUntil(COLUMNS, contentType, content)
         rowsUntil(row, contentType, continuedString)
         cellUntil(col, contentType, continuedString)
+      } else {
+        // row < currentRow  --> don't do anything (might have reached the end of the page)
       }
     }
 
@@ -82,7 +92,8 @@ class HtmlTable extends LayoutProperties {
       emptySpace(startPos(item))
       content(endPos(item), item.contentType, item.content)
     })
-    if (currentColumn != 0) `/tr`
+    emptySpace((ROWS, COLUMNS+1)) // fill remaining empty space
+    // if (currentColumn != 1) `/tr`
     writer.println(tableEnd)
     writer.println(htmlEnd)
     writer.close()
@@ -90,12 +101,14 @@ class HtmlTable extends LayoutProperties {
 
 }
 
+/**
+ * Companion object
+ *
+ * @author Steffen Hildebrandt
+ */
 object HtmlTable {
-
   /**
-   * Position (column, row) in a HtmlTable
+   * Position (row, column) in a HtmlTable
    */
   type Pos = (Int, Int)
 }
-
-case class TableItem(firstByte: Int, lastByte: Int, contentType: ContentType, content: String)
