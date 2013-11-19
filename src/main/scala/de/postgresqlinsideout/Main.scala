@@ -22,7 +22,7 @@ object Main extends App {
     table.addItem(TableItem(500, 501, HEADER, "TestHeader"))
     table.addItem(TableItem(502, 503, DATA, "Data"))
     table.addItem(TableItem(8010, 8191, DATA, "Data"))
-    table.printHTML5(new File("output/Test.html"))
+    table.printHTML5(new File("output/PageLayout.html"))
   }
 
 }
