@@ -1,19 +1,25 @@
-package de.postgresqlinsideout
+package de.postgresqlinsideout.html
 
 import scala.collection.SortedSet
 import java.io.{PrintWriter, File}
-import de.postgresqlinsideout.HtmlTable._
 import ContentType._
 
 /**
-  * @author Steffen Hildebrandt
+ * A class providing utilities to illustrate the content of a PostgreSQL page
+ *
+ * @author Steffen Hildebrandt
  */
-class HtmlTable {
+class HtmlTable extends LayoutProperties {
+  import HtmlTable._
 
   val tableItemOrdering = Ordering[Int].on[TableItem](t => t.firstByte)
   private var contents = SortedSet[TableItem]()(tableItemOrdering)
 
   def addItem(item: TableItem) = contents += item
+
+  private def startPos(item: TableItem) = (item.firstByte / COLUMNS, item.firstByte % COLUMNS)
+
+  private def endPos(item: TableItem) = (item.lastByte / COLUMNS, item.lastByte % COLUMNS)
 
   def printHTML5(file: File) = {
     val writer = new PrintWriter(file)
@@ -70,8 +76,8 @@ class HtmlTable {
     writer.println(header)
     writer.println(tableHead)
     contents.foreach(item => {
-      emptySpace(item.startPos)
-      content(item.endPos, item.contentType, item.content)
+      emptySpace(startPos(item))
+      content(endPos(item), item.contentType, item.content)
     })
     if (currentColumn != 0) `/tr`
     writer.println(tableEnd)
@@ -87,37 +93,6 @@ object HtmlTable {
    * Position (column, row) in a HtmlTable
    */
   type Pos = (Int, Int)
-
-  val TABLE_SIZE = 8192 // bytes
-  val COLUMNS = 64
-  val ROWS = TABLE_SIZE / COLUMNS
-
-  val TABLE_WIDTH = 1000 // px
-  val ROW_HEIGHT = 20 // px
-  val COLUMN_WIDTH = TABLE_WIDTH / COLUMNS
-
-  val htmlHead = """<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
-                   |<html>""".stripMargin
-
-  val header = s"""<head>
-                  |<title>PostgreSQL PageLayout</title>
-                  |<link rel="stylesheet" type="text/css" href="style.css">
-                  |</head>""".stripMargin
-
-  val tableHead = {
-    val body = "<body><div align='center'>\n"
-    val table = "  <table>\n"
-    val cols = (1 to COLUMNS) map (_ => s"    <col width='$COLUMN_WIDTH'/>\n") mkString ""
-    body + table + cols
-  }
-
-  val tableEnd = "  </table></div>\n</body>"
-
-  val htmlEnd = "</html>"
-
 }
 
-case class TableItem(firstByte: Int, lastByte: Int, contentType: ContentType, content: String) {
-  val startPos = (firstByte / COLUMNS, firstByte % COLUMNS)
-  val endPos = (lastByte / COLUMNS, lastByte % COLUMNS)
-}
+case class TableItem(firstByte: Int, lastByte: Int, contentType: ContentType, content: String)

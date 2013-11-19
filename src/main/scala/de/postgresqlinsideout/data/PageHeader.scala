@@ -1,4 +1,6 @@
-package de.postgresqlinsideout
+package de.postgresqlinsideout.data
+
+import de.postgresqlinsideout.html.{ContentType, TableItem}
 
 /**
  * Representation of a page header in PostgreSQL
@@ -18,10 +20,13 @@ package de.postgresqlinsideout
  */
 class PageHeader(val lsn: Field[String], val checksum: Field[Int], val flags: Field[Int], val lower: Field[Int],
                  val upper: Field[Int], val special: Field[Int], val pagesize: Field[Int], val version: Field[Int],
-                 val pruneXid: Field[Int]) {
+                 val pruneXid: Field[Int]) extends FieldList {
 
-  override def toString() =
-    s"PageHeader($lsn, $checksum, $flags, $lower, $upper, $special, $pagesize, $version, $pruneXid)"
+  override def toString() = "PageHeader" + itemString
+    //s"PageHeader($lsn, $checksum, $flags, $lower, $upper, $special, $pagesize, $version, $pruneXid)"
+
+  override def toList() = List(lsn, checksum, flags, lower, upper, special, pagesize, version, pruneXid)
+
 }
 
 object PageHeader {

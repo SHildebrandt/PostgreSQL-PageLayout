@@ -1,0 +1,29 @@
+package de.postgresqlinsideout.data
+
+import de.postgresqlinsideout.html.{ContentType, TableItem}
+
+/**
+ * Atomic field on a PostgreSQL page, e.g. in the page header or heap tuple header
+ *
+ * @author Steffen Hildebrandt
+ */
+class Field[T](val name: String, val value: T, val size: Int)  {
+
+  override def toString = s"$name=$value"
+
+}
+
+abstract class FieldList {
+
+  def toList(): List[Field[_]]
+
+  def toTableItemList(offset: Int) =
+    this.toList().foldLeft((offset, List[TableItem]()))((tuple, f) => {
+      val (off, list) = tuple
+      val newOff = off + f.size
+      val item = TableItem(off, newOff, ContentType.HEADER, f.value.toString)
+      (newOff, list:+item)
+    })._2
+
+  def itemString = "(" + (this.toList map (f => s"${f.name}=${f.value}") mkString ",") + ")"
+}

@@ -1,4 +1,4 @@
-package de.postgresqlinsideout
+package de.postgresqlinsideout.data
 
 import scala.slick.session.Database
 import scala.slick.jdbc.{StaticQuery, GetResult}
@@ -11,7 +11,8 @@ import Database.threadLocalSession
 object DBAccess {
 
   lazy val db = Database.forURL("jdbc:postgresql://localhost/booktown", user = "postgres", password = "postgres")
-  Class.forName("org.postgresql.Driver") // initialize PostgreSQL driver
+  Class.forName("org.postgresql.Driver")
+  // initialize PostgreSQL driver
 
   implicit val getPageHeaderResult = GetResult(r =>
     PageHeader(r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<))
