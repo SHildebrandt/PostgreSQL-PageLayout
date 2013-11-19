@@ -1,4 +1,4 @@
-package de.postgresqlinsideout
+package de.postgresqlinsideout.pagelayout
 
 import java.io.File
 import de.postgresqlinsideout.html.{ContentType, TableItem, HtmlTable}

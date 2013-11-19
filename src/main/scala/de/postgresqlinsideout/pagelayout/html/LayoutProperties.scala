@@ -18,15 +18,21 @@ trait LayoutProperties {
   val htmlHead = """<!DOCTYPE html>
                    |<html>""".stripMargin
 
+  val style = s"""<link rel="stylesheet" type="text/css" href="style.css">
+                 |<style type="text/css">
+                 |div { align:center; }
+                 |col { width:${COLUMN_WIDTH}px; }
+                 |</style>""".stripMargin
+
   val header = s"""<head>
                   |<title>PostgreSQL PageLayout</title>
-                  |<link rel="stylesheet" type="text/css" href="style.css">
+                  |$style
                   |</head>""".stripMargin
 
   val tableHead = {
     val body = "<body><div align='center'>\n"
     val table = "  <table>\n"
-    val cols = (1 to COLUMNS) map (_ => s"    <col width='$COLUMN_WIDTH'/>") mkString "\n"
+    val cols = (1 to COLUMNS) map (_ => s"    <col />") mkString "\n"
     body + table + cols
   }
 

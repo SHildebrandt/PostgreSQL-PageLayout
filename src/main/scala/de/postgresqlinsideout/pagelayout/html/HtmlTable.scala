@@ -26,7 +26,10 @@ class HtmlTable extends LayoutProperties {
     var currentRow = 0
     var currentColumn = 0
 
-    def tr(rowspan: Int = 1) = writer.println(s"    <tr rowspan=$rowspan>")
+    def tr(rowspan: Int = 1) = {
+      val rs = if (rowspan == 1) "" else s" rowspan=$rowspan"
+      writer.println(s"    <tr$rs>")
+    }
     def `/tr` = writer.println("    </tr>")
     def td(clazz: String = "default", colspan: Int = 1) = writer.print(s"      <td colspan=$colspan class='$clazz'>")
     def `/td` = writer.println("</td>")
