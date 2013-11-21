@@ -1,6 +1,6 @@
 package de.postgresqlinsideout.pagelayout.data
 
-import de.postgresqlinsideout.pagelayout.representation.{ContentType, PageItem}
+import de.postgresqlinsideout.pagelayout.representation.{ContentType, PageElement}
 
 /**
  * Atomic field on a PostgreSQL page, e.g. in the page header or heap tuple header
@@ -18,10 +18,10 @@ abstract class FieldList {
   def toList(): List[Field[_]]
 
   def toTableItemList(offset: Int) =
-    this.toList().foldLeft((offset, List[PageItem]()))((tuple, f) => {
+    this.toList().foldLeft((offset, List[PageElement]()))((tuple, f) => {
       val (off, list) = tuple
       val newOff = off + f.size
-      val item = PageItem(off, newOff, ContentType.HEADER, f.value.toString)
+      val item = PageItem(off, newOff, ContentType.PAGE_HEADER, f.value.toString)
       (newOff, list:+item)
     })._2
 

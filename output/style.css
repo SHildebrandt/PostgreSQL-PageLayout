@@ -1,6 +1,7 @@
 table.center {
   border:3px solid black;
   table-layout:fixed;
+  width:80%;
   margin: 0 auto;
 }
 
@@ -9,16 +10,34 @@ td {
   height:20px;
   text-align:center;
   overflow:hidden;
+  word-wrap: break-word;
 }
 
 td.empty {
   background-color:gray;
 }
 
-td.data {
+td.item {
   background-color:red;
 }
 
-td.header {
+td.pageheader {
   background-color:yellow;
+}
+
+td.dataheader {
+  background-color:yellow;
+}
+
+td.itemiddata {
+  background-color:green;
+}
+
+/* test 
+#idpointer2 {
+  border:3px dotted black;
+}*/
+
+#idpointer1:hover ~ #idpointer2 {
+  background-color:red;
 }

@@ -7,6 +7,13 @@ package de.postgresqlinsideout.pagelayout.representation
  */
 trait LayoutProperties {
 
+  /**
+   * Returns a String containing CSS style definitions with hovers
+   * (-> mouseovers, e.g. to highlight the entry which corresponds to a field in ItemIdData)
+   * @return a String with hover definitions
+   */
+  def getHovers: String
+  
   val TABLE_SIZE = 8192 // bytes
   val COLUMNS = 64
   val ROWS = TABLE_SIZE / COLUMNS
@@ -15,27 +22,30 @@ trait LayoutProperties {
   val ROW_HEIGHT = 20 // px
   val COLUMN_WIDTH = TABLE_WIDTH / COLUMNS
 
-  val htmlHead = """<!DOCTYPE html>
+  val HOVER_STYLE = "background-color:red;"
+
+  def htmlHead = """<!DOCTYPE html>
                    |<html>""".stripMargin
 
-  val style = s"""<link rel="stylesheet" type="text/css" href="style.css">
+  def style = s"""<link rel="stylesheet" type="text/css" href="style.css">
                  |<style type="text/css">
                  |  col.fixedWidth { width:${COLUMN_WIDTH}px; }
+                 |$getHovers
                  |</style>""".stripMargin
 
-  val header = s"""<head>
+  def header = s"""<head>
                   |<title>PostgreSQL PageLayout</title>
                   |$style
                   |</head>""".stripMargin
 
-  val tableHead = {
+  def tableHead = {
     val body = "<body>\n"
     val table = "  <table class='center'>\n"
     val cols = (1 to COLUMNS) map (_ => s"    <col class='fixedWidth'/>") mkString "\n"
     body + table + cols
   }
 
-  val tableEnd = "  </table>\n</body>"
+  def tableEnd = "  </table>\n</body>"
 
-  val htmlEnd = "</html>"
+  def htmlEnd = "</html>"
 }

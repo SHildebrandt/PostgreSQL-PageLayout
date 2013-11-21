@@ -1,5 +1,7 @@
 package de.postgresqlinsideout.pagelayout.data
 
+import de.postgresqlinsideout.pagelayout.Page
+
 /**
  * Representation of a heap page item in PostgreSQL
  * (as described in the PostgreSQL source code)
@@ -24,7 +26,7 @@ package de.postgresqlinsideout.pagelayout.data
  */
 class HeapPageItem(val lp: Field[Int], val lpOff: Field[Int], val lpFlags: Field[Int], val lpLen: Field[Int],
                    val tXmin: Field[Int], val tXmax: Field[Int], val tField3: Field[Int], val tCtid: Field[(Int, Int)],
-                   val tInfomask2: Field[Int], val tInfomask: Field[Int], val tHoff: Field[Int], val tBits: Field[Int],
+                   val tInfomask2: Field[Int], val tInfomask: Field[Int], val tHoff: Field[Int], val tBits: Field[String],
                    val tOid: Field[Int])
   extends FieldList {
 
@@ -32,12 +34,17 @@ class HeapPageItem(val lp: Field[Int], val lpOff: Field[Int], val lpFlags: Field
                       tCtid, tInfomask2, tInfomask, tHoff, tBits, tOid)
 
   override def toString() = "HeapPageItem" + itemString
+
+  val itemIdDataStart = Page.ITEM_ID_DATA_START + (lp.value - 1) * 4
+  val itemIdDataEnd = itemIdDataStart + 3
+  val firstByte = lpOff.value
+  val lastByte = firstByte + lpLen.value
 }
 
 object HeapPageItem {
 
   def apply(lp: Int, lpOff: Int, lpFlags: Int, lpLen: Int, tXmin: Int, tXmax: Int, tField3: Int, tCtid: (Int, Int),
-             tInfomask2: Int, tInfomask: Int, tHoff: Int, tBits: Int, tOid: Int) =
+             tInfomask2: Int, tInfomask: Int, tHoff: Int, tBits: String, tOid: Int) =
     new HeapPageItem(
       new Field("lp", lp, 0),  // size ??
       new Field("lpOff", lpOff, 2),     // 15 bit

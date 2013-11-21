@@ -8,6 +8,8 @@ object ContentType extends Enumeration {
 
   type ContentType = ContentTypeVal
   val DATA = ContentTypeVal("Data", "data")
-  val HEADER = ContentTypeVal("Header", "header")
+  val PAGE_HEADER = ContentTypeVal("PageHeader", "pageheader")
+  val ITEM_HEADER = ContentTypeVal("DataHeader", "dataheader")
+  val ITEM_ID_DATA = ContentTypeVal("ItemIdData", "itemid")
   val EMPTY = ContentTypeVal("Empty", "empty")
 }

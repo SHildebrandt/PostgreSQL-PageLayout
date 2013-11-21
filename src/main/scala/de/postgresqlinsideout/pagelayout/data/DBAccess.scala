@@ -10,7 +10,8 @@ import Database.threadLocalSession
  */
 object DBAccess {
 
-  lazy val db = Database.forURL("jdbc:postgresql://localhost/booktown", user = "postgres", password = "postgres")
+  lazy val db = Database.forURL("jdbc:postgresql://localhost/dell", user = "postgres", password = "postgres")
+  //lazy val db = Database.forURL("jdbc:postgresql://localhost/booktown", user = "postgres", password = "postgres")
   Class.forName("org.postgresql.Driver")
   // initialize PostgreSQL driver
 
