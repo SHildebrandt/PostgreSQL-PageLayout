@@ -1,10 +1,9 @@
 package de.postgresqlinsideout.pagelayout
 
 import java.io.File
-import de.postgresqlinsideout.pagelayout.data.DBAccess
-import de.postgresqlinsideout.pagelayout.representation.PageElement
-import de.postgresqlinsideout.pagelayout.representation.HtmlTable
-import de.postgresqlinsideout.pagelayout.representation.ContentType._
+import de.postgresqlinsideout.pagelayout.data.{Page, DBAccess}
+import de.postgresqlinsideout.pagelayout.visualization.PageElement
+import de.postgresqlinsideout.pagelayout.visualization.HtmlTable
 
 
 /**
@@ -14,11 +13,12 @@ object Main extends App {
 
   override def main(args: Array[String]) {
 
-    val page = new PageLayout("customers", 0)
-    page.getRepresentation.printToFile(new File("output/Authors0.html"))
+    val page = new Page("customers", 0)
+    page.getPageVisualization.printToFile(new File("output/Authors0.html"))
 
   }
 
+  /*
   def test = {
     val pageHeader = DBAccess.getPageHeader("authors", 0)
     val heapPageItems = DBAccess.getHeapPageItems("authors", 0)
@@ -36,5 +36,6 @@ object Main extends App {
     table.addItem(PageItem(8010, 8191, DATA, "Data"))
     table.printToFile(new File("output/PageLayout.html"))
   }
+  */
 
 }

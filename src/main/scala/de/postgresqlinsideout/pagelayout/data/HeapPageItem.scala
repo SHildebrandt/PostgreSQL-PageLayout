@@ -1,6 +1,5 @@
 package de.postgresqlinsideout.pagelayout.data
 
-import de.postgresqlinsideout.pagelayout.Page
 
 /**
  * Representation of a heap page item in PostgreSQL
@@ -31,7 +30,7 @@ class HeapPageItem(val lp: Field[Int], val lpOff: Field[Int], val lpFlags: Field
   extends FieldList {
 
   def toList() = List(lp, lpOff, lpFlags, lpLen, tXmin, tXmax, tField3,
-                      tCtid, tInfomask2, tInfomask, tHoff, tBits, tOid)
+    tCtid, tInfomask2, tInfomask, tHoff, tBits, tOid)
 
   override def toString() = "HeapPageItem" + itemString
 
@@ -44,12 +43,12 @@ class HeapPageItem(val lp: Field[Int], val lpOff: Field[Int], val lpFlags: Field
 object HeapPageItem {
 
   def apply(lp: Int, lpOff: Int, lpFlags: Int, lpLen: Int, tXmin: Int, tXmax: Int, tField3: Int, tCtid: (Int, Int),
-             tInfomask2: Int, tInfomask: Int, tHoff: Int, tBits: String, tOid: Int) =
+            tInfomask2: Int, tInfomask: Int, tHoff: Int, tBits: String, tOid: Int) =
     new HeapPageItem(
-      new Field("lp", lp, 0),  // size ??
-      new Field("lpOff", lpOff, 2),     // 15 bit
+      new Field("lp", lp, 0), // size ??
+      new Field("lpOff", lpOff, 2), // 15 bit
       new Field("lpFlags", lpFlags, 0), //  2 bit
-      new Field("lpLen", lpLen, 2),     // 15 bit
+      new Field("lpLen", lpLen, 2), // 15 bit
       new Field("tXmin", tXmin, 4),
       new Field("tXmax", tXmax, 4),
       new Field("tField3", tField3, 4),

@@ -1,4 +1,4 @@
-package de.postgresqlinsideout.pagelayout.representation
+package de.postgresqlinsideout.pagelayout.visualization
 
 /**
  * A trait providing basic constants for the layout of a @link{HtmlTable}

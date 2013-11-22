@@ -16,7 +16,7 @@ package de.postgresqlinsideout.pagelayout.data
  *
  * @author Steffen Hildebrandt
  */
-class PageHeader(val lsn: Field[String], val checksum: Field[Int], val flags: Field[Int], val lower: Field[Int],
+class PageHeaderData(val lsn: Field[String], val checksum: Field[Int], val flags: Field[Int], val lower: Field[Int],
                  val upper: Field[Int], val special: Field[Int], val pagesize: Field[Int], val version: Field[Int],
                  val pruneXid: Field[Int]) extends FieldList {
 
@@ -28,11 +28,11 @@ class PageHeader(val lsn: Field[String], val checksum: Field[Int], val flags: Fi
 
 }
 
-object PageHeader {
+object PageHeaderData {
 
   def apply(lsn: String, checksum: Int, flags: Int, lower: Int, upper: Int, special: Int,
             pagesize: Int, version: Int, pruneXid: Int) =
-    new PageHeader(
+    new PageHeaderData(
       new Field("lsn", lsn, 8),
       new Field("checksum", checksum, 2),
       new Field("flags", flags, 2),

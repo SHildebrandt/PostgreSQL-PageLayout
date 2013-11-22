@@ -16,7 +16,7 @@ object DBAccess {
   // initialize PostgreSQL driver
 
   implicit val getPageHeaderResult = GetResult(r =>
-    PageHeader(r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<))
+    PageHeaderData(r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<))
 
   implicit val getHeapPageItemResult = GetResult(r =>
     HeapPageItem(r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, stringToIntTupel(r.<<[String]), r.<<, r.<<, r.<<, r.<<, r.<<))
@@ -33,9 +33,9 @@ object DBAccess {
     case _ => throw new Exception("Could not parse Int-Tuple: " + s)
   }
 
-  def getPageHeader(table: String, pageNo: Int): PageHeader = {
+  def getPageHeader(table: String, pageNo: Int): PageHeaderData = {
     db withSession {
-      val result = StaticQuery.queryNA[PageHeader](s"SELECT * FROM page_header(get_raw_page('$table', $pageNo))").list()
+      val result = StaticQuery.queryNA[PageHeaderData](s"SELECT * FROM page_header(get_raw_page('$table', $pageNo))").list()
       if (result.size != 1)
         throw new Exception("Unexpected result size of function page_header")
       result(0)

@@ -1,23 +1,29 @@
-package de.postgresqlinsideout.pagelayout.representation
+package de.postgresqlinsideout.pagelayout.visualization
 
 import scala.collection.SortedSet
 import java.io.{PrintWriter, File}
-import de.postgresqlinsideout.pagelayout.representation.ContentType._
+import scala.collection.immutable.IndexedSeq
 
 
 /**
- * A class providing utilities to illustrate the content of a PostgreSQL page
+ * A class providing utilities to visualize the content of a PostgreSQL page
  *
  * @author Steffen Hildebrandt
  */
-class HtmlTable extends PageRepresentation with LayoutProperties {
+class HtmlTable(elements: List[PageElement]) extends PageVisualization with LayoutProperties {
 
   import HtmlTable._
 
   val tableItemOrdering: Ordering[PageElement] = Ordering[Int].on[PageElement](t => t.firstByte)
-  private var contents = SortedSet[PageElement]()(tableItemOrdering)
+  /** elements + Empty elements */
+  val contents: SortedSet[PageElement] = { 
+    val sorted = SortedSet[PageElement](elements:_*)(tableItemOrdering)
+    val nonEmpty = sorted flatMap (e => (e.firstByte to e.lastByte))
+    val empty = (1 to TABLE_SIZE) filterNot (nonEmpty contains _)
+    sorted ++ (empty map (i => Empty(i, i)))
+  }
 
-  override def addItem(item: PageElement) = contents += item
+  //override def addItem(item: PageElement) = contents += item
 
   override def getHovers = {
     contents flatMap { // filter ItemIdData
@@ -39,21 +45,22 @@ class HtmlTable extends PageRepresentation with LayoutProperties {
 
     def tr = writer.println("    <tr>")
     def `/tr` = writer.println("    </tr>")
-    def td(clazz: String = "", colspan: Int = 1) = writer.print(s"      <td colspan=$colspan class='$clazz'>")
+    def td(id: String = "", clazz: String = "", colspan: Int = 1) =
+      writer.print(s"      <td colspan=$colspan id=$id, class='$clazz'>")
     def `/td` = writer.println("</td>")
 
-    def cell(colspan: Int, id: String, contentType: ContentType, content: String = "") = {
-      td(contentType.tdClass, colspan)
-      if (content != "")
-        writer.print(content)
+    def cell(colspan: Int, element: PageElement) = {
+      td(element.id, element.tdClass, colspan)
+      if (element.content != "")
+        writer.print(element.content)
       `/td`
       currentColumn += colspan
     }
 
-    def cellUntil(column: Int, id: String, contentType: ContentType, content: String = "") = {
+    def cellUntil(column: Int, element: PageElement) = {
       if (column >= currentColumn) {
         if (currentColumn == 1) tr
-        cell(column - currentColumn + 1, id, contentType, content)
+        cell(column - currentColumn + 1, element: PageElement)
       }
       if (column == COLUMNS) {
         `/tr`
@@ -62,37 +69,34 @@ class HtmlTable extends PageRepresentation with LayoutProperties {
       }
     }
 
-    def rowsUntil(row: Int, id: String, contentType: ContentType, content: String = "") = {
+    def rowsUntil(row: Int, element: PageElement) = {
       // (Range.)until excludes the last element!
-      (currentRow until row) foreach (_ => cellUntil(COLUMNS, id, contentType, content))
+      (currentRow until row) foreach (_ => cellUntil(COLUMNS, element))
     }
 
-    def content(endPos: Pos, id: String, contentType: ContentType, content: String = "") = {
+    def content(endPos: Pos, element: PageElement) = {
       val row = endPos._1
       val col = endPos._2
       if (row == currentRow)
-        cellUntil(col, id, contentType, content)
+        cellUntil(col, element)
       else if (row > currentRow) {
         // might want to optimize content position...
-        val continuedString = if (content == "") "" else "..."
-        cellUntil(COLUMNS, id, contentType, content)
-        rowsUntil(row, id, contentType, continuedString)
-        cellUntil(col, id, contentType, continuedString)
+        // TODO: Fix continuedString
+        val continuedString = if (element.content == "") "" else "..."
+        cellUntil(COLUMNS, element)
+        rowsUntil(row, element)
+        cellUntil(col, element)
       } else {
         // row < currentRow  --> don't do anything (might have reached the end of the page)
       }
     }
 
-    def emptySpace(nextItem: Pos) = content((nextItem._1, nextItem._2 - 1), "", EMPTY, "")
-
     writer.println(htmlHead)
     writer.println(header)
     writer.println(tableHead)
-    contents.foreach(item => {
-      emptySpace(startPos(item))
-      content(endPos(item), item.htmlId, item.contentType, item.content)
+    contents.foreach(element => {
+      content(endPos(element), element)
     })
-    emptySpace((ROWS, COLUMNS + 1)) // fill remaining empty space
     // if (currentColumn != 1) `/tr`
     writer.println(tableEnd)
     writer.println(htmlEnd)
