@@ -25,14 +25,16 @@ class HtmlTable(elements: List[PageElement]) extends PageVisualization with Layo
 
   //override def addItem(item: PageElement) = contents += item
 
+  /*
   override def getHovers = {
     contents flatMap { // filter ItemIdData
       case i : ItemIdData => Some(i)
       case _              => None
     } map {c =>
-      s"#${c.id}:hover ~ #${c.itemHeader.id} { $HOVER_STYLE }"
+      s"table td#${c.id}:hover ~ #${c.itemHeader.id} { $EMPHASIZE_STYLE }"
     } mkString "\n"
   }
+  */
 
   private def startPos(item: PageElement) = (item.firstByte / COLUMNS + 1, item.firstByte % COLUMNS + 1)
 
@@ -45,12 +47,16 @@ class HtmlTable(elements: List[PageElement]) extends PageVisualization with Layo
 
     def tr = writer.println("    <tr>")
     def `/tr` = writer.println("    </tr>")
-    def td(id: String = "", clazz: String = "", colspan: Int = 1) =
-      writer.print(s"      <td colspan=$colspan id=$id, class='$clazz'>")
+    def td(id: String = "", clazz: String = "", colspan: Int = 1, mouseover: String = "") =
+      writer.print(s"      <td id=$id class='$clazz' colspan=$colspan $mouseover>")
     def `/td` = writer.println("</td>")
 
     def cell(colspan: Int, element: PageElement) = {
-      td(element.id, element.tdClass, colspan)
+      val mouseover = element match {
+        case ItemIdData(_, _, h) => emphasize(h.id)
+        case _ => ""
+      }
+      td(element.id, element.tdClass, colspan, mouseover)
       if (element.content != "")
         writer.print(element.content)
       `/td`

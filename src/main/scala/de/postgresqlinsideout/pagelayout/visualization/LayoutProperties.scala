@@ -12,7 +12,7 @@ trait LayoutProperties {
    * (-> mouseovers, e.g. to highlight the entry which corresponds to a field in ItemIdData)
    * @return a String with hover definitions
    */
-  def getHovers: String
+  //def getHovers: String
   
   val TABLE_SIZE = 8192 // bytes
   val COLUMNS = 64
@@ -22,7 +22,9 @@ trait LayoutProperties {
   val ROW_HEIGHT = 20 // px
   val COLUMN_WIDTH = TABLE_WIDTH / COLUMNS
 
-  val HOVER_STYLE = "background-color:red;"
+  val EMPHASIZE_FUNCTION_NAME = "emphasize"
+  val UNEMPHASIZE_FUNCTION_NAME = "unemphasize"
+  val EMPHASIZE_STYLE = "backgroundColor = \"orange\""
 
   def htmlHead = """<!DOCTYPE html>
                    |<html>""".stripMargin
@@ -30,12 +32,19 @@ trait LayoutProperties {
   def style = s"""<link rel="stylesheet" type="text/css" href="style.css">
                  |<style type="text/css">
                  |  col.fixedWidth { width:${COLUMN_WIDTH}px; }
-                 |$getHovers
                  |</style>""".stripMargin
 
   def header = s"""<head>
                   |<title>PostgreSQL PageLayout</title>
                   |$style
+                  |<script language="javascript" type="text/javascript">
+                  |function $EMPHASIZE_FUNCTION_NAME(id) {
+                  |   document.getElementById(id).style.$EMPHASIZE_STYLE;
+                  |}
+                  |function $UNEMPHASIZE_FUNCTION_NAME(id) {
+                  |   document.getElementById(id).style.backgroundColor = \"\";
+                  |}
+                  |</script>
                   |</head>""".stripMargin
 
   def tableHead = {
@@ -48,4 +57,7 @@ trait LayoutProperties {
   def tableEnd = "  </table>\n</body>"
 
   def htmlEnd = "</html>"
+
+  def emphasize(id: String) = // escaping quotes in String interpolations doesn't work.....
+    s"onmouseover=${'"'}$EMPHASIZE_FUNCTION_NAME('$id')${'"'} onmouseout=${'"'}$UNEMPHASIZE_FUNCTION_NAME('$id')${'"'}"
 }

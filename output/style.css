@@ -10,7 +10,7 @@ td {
   height:20px;
   text-align:center;
   overflow:hidden;
-  word-wrap: break-word;
+  word-wrap:break-word;
 }
 
 td.empty {
@@ -33,7 +33,7 @@ td.itemiddata {
   background-color:green;
 }
 
-/* test 
+/* test
 #idpointer2 {
   border:3px dotted black;
 }*/
