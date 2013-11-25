@@ -18,7 +18,17 @@ class HtmlTable(elements: List[PageElement]) extends PageVisualization with Layo
   /** elements + Empty elements */
   val contents: SortedSet[PageElement] = { 
     val sorted = SortedSet[PageElement](elements:_*)(tableItemOrdering)
-    sorted ++ computeEmpty(sorted)
+    val withEmpty = sorted ++ computeEmpty(sorted)
+
+    // TODO: improve that... ignore range should be cut to multiple of row size and something similar to leftOutRows might be helpful, too
+    val fixedRange = IGNORED_BYTE_RANGE map {case (a, b) => (a - a % COLUMNS, (b + COLUMNS) - (b + COLUMNS) % COLUMNS)}
+    fixedRange match {
+      case None => withEmpty
+      case Some((start, end)) =>
+        val firstElem = (withEmpty find (e => e.firstByte <= start && start <= e.lastByte)).get.firstByte
+        val lastElem = (withEmpty find (e => e.firstByte <= end && end <= e.lastByte)).get.lastByte
+        (withEmpty filter (e => e.lastByte < start || e.firstByte > end)) + Ignored(firstElem, lastElem)
+    }
   }
 
   def computeEmpty(set: SortedSet[PageElement]): SortedSet[PageElement] = {
@@ -65,23 +75,25 @@ class HtmlTable(elements: List[PageElement]) extends PageVisualization with Layo
       writer.print(s"      <td id=$id class='$clazz' colspan=$colspan title='$title' $mouseover><div class='td'>")
     def `/td` = writer.println("</div></td>")
 
-    def cell(colspan: Int, element: PageElement) = {
+    def cell(colspan: Int, element: PageElement, useContinuedContent: Boolean) = {
       val mouseover = element match {
         case ItemIdData(_, _, h) => emphasize(h.id)
         case _ => ""
       }
-      val title = s"Start Byte = ${element.firstByte}, Length = ${element.lastByte - element.firstByte + 1}\n${element.content}"
+      val title = s"Start Byte = ${element.firstByte}, Length = ${element.lastByte - element.firstByte + 1}\n${element.title}"
       td(element.id, element.tdClass, colspan, title, mouseover)
-      if (element.content != "")
+      if (!useContinuedContent)
         writer.print(element.content)
+      else
+        writer.print(element.contentContinued)
       `/td`
       currentColumn += colspan
     }
 
-    def cellUntil(column: Int, element: PageElement) = {
+    def cellUntil(column: Int, element: PageElement, useContinuedContent: Boolean = false) = {
       if (column >= currentColumn) {
         if (currentColumn == 1) tr
-        cell(column - currentColumn + 1, element: PageElement)
+        cell(column - currentColumn + 1, element: PageElement, useContinuedContent)
       }
       if (column == COLUMNS) {
         `/tr`
@@ -92,7 +104,7 @@ class HtmlTable(elements: List[PageElement]) extends PageVisualization with Layo
 
     def rowsUntil(row: Int, element: PageElement) = {
       // (Range.)until excludes the last element!
-      (currentRow until row) foreach (_ => cellUntil(COLUMNS, element))
+      (currentRow until row) foreach (_ => cellUntil(COLUMNS, element, true))
     }
 
     def leftOutRows(element: PageElement) = {
@@ -102,22 +114,32 @@ class HtmlTable(elements: List[PageElement]) extends PageVisualization with Layo
     def content(endPos: Pos, element: PageElement) = {
       val row = endPos._1
       val col = endPos._2
-      if (row == currentRow)
-        cellUntil(col, element)
-      else if (row > currentRow) {
-        // might want to optimize content position...
-        // TODO: Fix continuedString, maybe use another parameter for cellUntil, cell,... to indicate continuedString and make it a field of PageElement
-        val continuedString = if (element.content == "") "" else "..."
-        cellUntil(COLUMNS, element)
-        if (COMPRESS_INNER_ROWS && row - currentRow >= 1) {
+      val contentRows = row - currentRow + 1
+      if (contentRows == 1)
+      cellUntil(col, element)
+      else if (contentRows > 1) {
+        val contentInNextRow =
+          element.content.size > 0 &&
+          currentColumn.toDouble / COLUMNS > 0.85 &&
+          (contentRows > 2 || col.toDouble / COLUMNS > 0.15)                        
+        val leaveOutRows =
+          COMPRESS_INNER_ROWS &&
+            (contentRows > 3 ||
+              (contentRows == 3 && !contentInNextRow))
+
+        cellUntil(COLUMNS, element, contentInNextRow) /* 'if contentInNextRow then useContinuedContent in first row' */
+
+        if (contentInNextRow && contentRows > 2)
+          cellUntil(COLUMNS, element, false)
+        if (leaveOutRows)
           leftOutRows(element)
-          currentRow = row
-        } else {
+        else
           rowsUntil(row, element)
-        }
-        cellUntil(col, element)
+
+        currentRow = row
+        cellUntil(col, element, !(contentInNextRow && contentRows == 2))
       } else {
-        // row < currentRow  --> don't do anything (might have reached the end of the page)
+        // contentRows < 1  --> don't do anything (might happen when we have reached the end of the page)
       }
     }
 

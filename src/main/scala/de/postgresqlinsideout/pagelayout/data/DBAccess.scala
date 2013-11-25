@@ -11,8 +11,8 @@ import scala.collection.mutable.ListBuffer
  */
 object DBAccess {
 
-  //lazy val db = Database.forURL("jdbc:postgresql://localhost/dell", user = "postgres", password = "postgres")
-  lazy val db = Database.forURL("jdbc:postgresql://localhost/booktown", user = "postgres", password = "postgres")
+  lazy val db = Database.forURL("jdbc:postgresql://localhost/dell", user = "postgres", password = "postgres")
+  //lazy val db = Database.forURL("jdbc:postgresql://localhost/booktown", user = "postgres", password = "postgres")
 
   // initialize PostgreSQL driver
   Class.forName("org.postgresql.Driver")

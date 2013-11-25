@@ -27,9 +27,16 @@ trait LayoutProperties {
   val EMPHASIZE_STYLE = "backgroundColor = \"blue\""
 
   /**
-   * Should the inner rows be compressed, if a PageElement reaches over more than 2 rows?
+    * Should the inner rows be compressed, if a PageElement reaches over more than 2 rows?
    */
   val COMPRESS_INNER_ROWS = true
+
+  /**
+   * This field can be used to cut out/ignore a byte range of the page
+   * (might make sense for tables with many columns,
+   * where COMPRESS_INNER_ROWS doesn't keep the visualization small enough)
+   */
+  val IGNORED_BYTE_RANGE: Option[(Int, Int)] = Some(1000, 6000)
 
   def htmlHead = """<!DOCTYPE html>
                    |<html>""".stripMargin

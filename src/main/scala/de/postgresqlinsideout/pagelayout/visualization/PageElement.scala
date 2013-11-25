@@ -12,36 +12,55 @@ sealed trait PageElement {
   val firstByte: Int
   val lastByte: Int
   val content: String
+  def title = content // the small box that pops up if you stay on a cell for a bit longer
+  /**
+   * Content of this PageElement if in the following rows (if it reaches until there)
+   */
+  val contentContinued: String
 
   val id: String = "id" + firstByte.toString
   val tdClass: String
 }
 
 case class PageHeader(firstByte: Int, lastByte: Int, pageHeaderData: PageHeaderData) extends PageElement {
-  val content = pageHeaderData.toString
+  val content = "PageHeader"
+  override def title = pageHeaderData.toString
+  val contentContinued = ""
   val tdClass = "pageheader"
 }
 
 case class ItemIdData(firstByte: Int, lastByte: Int, itemHeader: ItemHeader) extends PageElement {
   val content = s"--> ${itemHeader.firstByte}"
+  override def title = s"Pointer to Byte ${itemHeader.firstByte}"
+  val contentContinued = ""
   val tdClass = "itemiddata"
 }
 
 case class ItemHeader(firstByte: Int, lastByte: Int, item: Item) extends PageElement {
   val content = "ItemHeader"
+  override def title = item.heapPageItem.toString
+  val contentContinued = ""
   val tdClass = "itemheader"
 }
 
-case class Item(firstByte: Int, lastByte: Int, item: HeapPageItem) extends PageElement {
-  val table = item.fromTable
+case class Item(firstByte: Int, lastByte: Int, heapPageItem: HeapPageItem) extends PageElement {
+  val table = heapPageItem.fromTable
   lazy val content = table match {
-    case Some(t) => s"$t(${DBAccess.getContentForCtid(t, item.tCtid.value) mkString ","})"
-    case None => s"Item with ctid = ${item.tCtid.value}"
+    case Some(t) => s"$t(${DBAccess.getContentForCtid(t, heapPageItem.tCtid.value) mkString ","})"
+    case None => s"Item with ctid = ${heapPageItem.tCtid.value}"
   }
+  val contentContinued = "..."
   val tdClass = "item"
 }
 
 case class Empty(firstByte: Int, lastByte: Int) extends PageElement {
   val content = ""
+  val contentContinued = ""
   val tdClass = "empty"
+}
+
+case class Ignored(firstByte: Int, lastByte: Int) extends PageElement {
+  val content = ""
+  val contentContinued = ""
+  val tdClass = "ignored"
 }
