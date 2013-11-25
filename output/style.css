@@ -9,7 +9,7 @@ td {
   border:1px solid black;
   height:20px;
   text-align:center;
-  overflow:visible;
+  overflow:hidden;
   word-wrap:break-word;
 }
 
@@ -31,4 +31,13 @@ td.itemheader {
 
 td.itemiddata {
   background-color:green;
+}
+
+td.leftOutRow {
+  height:1px;
+  border:2px solid black;
+}
+
+div.td {
+  height:20px;
 }

@@ -62,15 +62,15 @@ class HtmlTable(elements: List[PageElement]) extends PageVisualization with Layo
     def tr = writer.println("    <tr>")
     def `/tr` = writer.println("    </tr>")
     def td(id: String = "", clazz: String = "", colspan: Int = 1, title: String = "", mouseover: String = "") =
-      writer.print(s"      <td id=$id class='$clazz' colspan=$colspan title='$title' $mouseover>")
-    def `/td` = writer.println("</td>")
+      writer.print(s"      <td id=$id class='$clazz' colspan=$colspan title='$title' $mouseover><div class='td'>")
+    def `/td` = writer.println("</div></td>")
 
     def cell(colspan: Int, element: PageElement) = {
       val mouseover = element match {
         case ItemIdData(_, _, h) => emphasize(h.id)
         case _ => ""
       }
-      val title = s"Start Byte = ${element.firstByte}, Length = ${element.lastByte - element.firstByte + 1}"
+      val title = s"Start Byte = ${element.firstByte}, Length = ${element.lastByte - element.firstByte + 1}\n${element.content}"
       td(element.id, element.tdClass, colspan, title, mouseover)
       if (element.content != "")
         writer.print(element.content)
@@ -95,6 +95,10 @@ class HtmlTable(elements: List[PageElement]) extends PageVisualization with Layo
       (currentRow until row) foreach (_ => cellUntil(COLUMNS, element))
     }
 
+    def leftOutRows(element: PageElement) = {
+      writer.println(s"    <tr><td class='${element.tdClass} leftOutRow' colspan=$COLUMNS></td></tr>")
+    }
+
     def content(endPos: Pos, element: PageElement) = {
       val row = endPos._1
       val col = endPos._2
@@ -105,7 +109,12 @@ class HtmlTable(elements: List[PageElement]) extends PageVisualization with Layo
         // TODO: Fix continuedString, maybe use another parameter for cellUntil, cell,... to indicate continuedString and make it a field of PageElement
         val continuedString = if (element.content == "") "" else "..."
         cellUntil(COLUMNS, element)
-        rowsUntil(row, element)
+        if (COMPRESS_INNER_ROWS && row - currentRow >= 1) {
+          leftOutRows(element)
+          currentRow = row
+        } else {
+          rowsUntil(row, element)
+        }
         cellUntil(col, element)
       } else {
         // row < currentRow  --> don't do anything (might have reached the end of the page)

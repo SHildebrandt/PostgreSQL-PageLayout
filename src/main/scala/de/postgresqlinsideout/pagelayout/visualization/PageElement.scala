@@ -23,7 +23,7 @@ case class PageHeader(firstByte: Int, lastByte: Int, pageHeaderData: PageHeaderD
 }
 
 case class ItemIdData(firstByte: Int, lastByte: Int, itemHeader: ItemHeader) extends PageElement {
-  val content = s"Pointer to ${itemHeader.firstByte}"
+  val content = s"--> ${itemHeader.firstByte}"
   val tdClass = "itemiddata"
 }
 

@@ -26,6 +26,11 @@ trait LayoutProperties {
   val UNEMPHASIZE_FUNCTION_NAME = "unemphasize"
   val EMPHASIZE_STYLE = "backgroundColor = \"blue\""
 
+  /**
+   * Should the inner rows be compressed, if a PageElement reaches over more than 2 rows?
+   */
+  val COMPRESS_INNER_ROWS = true
+
   def htmlHead = """<!DOCTYPE html>
                    |<html>""".stripMargin
 
