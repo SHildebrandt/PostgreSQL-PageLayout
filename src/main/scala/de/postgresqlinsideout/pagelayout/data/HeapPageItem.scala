@@ -29,6 +29,14 @@ class HeapPageItem(val lp: Field[Int], val lpOff: Field[Int], val lpFlags: Field
                    val tOid: Field[Int])
   extends FieldList {
 
+  /**
+   * This is a var, not a val.
+   * The reason is that the object should be creatable within a GetResult, which I can't pass any further parameters to.
+   * So this variable has to be set after the actual instantiation of the object.
+   * Another possibility would have been to create a wrapper class with this table field, but that's probably overkill.
+   */
+  var fromTable: Option[String] = None
+
   def toList() = List(lp, lpOff, lpFlags, lpLen, tXmin, tXmax, tField3,
     tCtid, tInfomask2, tInfomask, tHoff, tBits, tOid)
 
@@ -45,7 +53,7 @@ object HeapPageItem {
   def apply(lp: Int, lpOff: Int, lpFlags: Int, lpLen: Int, tXmin: Int, tXmax: Int, tField3: Int, tCtid: (Int, Int),
             tInfomask2: Int, tInfomask: Int, tHoff: Int, tBits: String, tOid: Int) =
     new HeapPageItem(
-      new Field("lp", lp, 0), // size ??
+      new Field("lp", lp, 0),
       new Field("lpOff", lpOff, 2), // 15 bit
       new Field("lpFlags", lpFlags, 0), //  2 bit
       new Field("lpLen", lpLen, 2), // 15 bit

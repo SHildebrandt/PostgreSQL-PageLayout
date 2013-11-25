@@ -1,6 +1,6 @@
 package de.postgresqlinsideout.pagelayout.visualization
 
-import de.postgresqlinsideout.pagelayout.data.{PageHeaderData, HeapPageItem}
+import de.postgresqlinsideout.pagelayout.data.{DBAccess, PageHeaderData, HeapPageItem}
 
 /**
  * An element within a page.
@@ -33,7 +33,11 @@ case class ItemHeader(firstByte: Int, lastByte: Int, item: Item) extends PageEle
 }
 
 case class Item(firstByte: Int, lastByte: Int, item: HeapPageItem) extends PageElement {
-  val content = item.toString
+  val table = item.fromTable
+  lazy val content = table match {
+    case Some(t) => s"$t(${DBAccess.getContentForCtid(t, item.tCtid.value) mkString ","})"
+    case None => s"Item with ctid = ${item.tCtid.value}"
+  }
   val tdClass = "item"
 }
 
@@ -41,10 +45,3 @@ case class Empty(firstByte: Int, lastByte: Int) extends PageElement {
   val content = ""
   val tdClass = "empty"
 }
-
-// TODO: Fix this... incredibly ugly...
-object Empty {
-  val tdClass = "empty"
-}
-
-

@@ -18,9 +18,23 @@ class HtmlTable(elements: List[PageElement]) extends PageVisualization with Layo
   /** elements + Empty elements */
   val contents: SortedSet[PageElement] = { 
     val sorted = SortedSet[PageElement](elements:_*)(tableItemOrdering)
-    val nonEmpty = sorted flatMap (e => (e.firstByte to e.lastByte))
-    val empty = (1 to TABLE_SIZE) filterNot (nonEmpty contains _)
-    sorted ++ (empty map (i => Empty(i, i)))
+    sorted ++ computeEmpty(sorted)
+  }
+
+  def computeEmpty(set: SortedSet[PageElement]): SortedSet[PageElement] = {
+    val it = (set map (e => (e.firstByte, e.lastByte))).iterator
+    var empty = SortedSet[PageElement]()(tableItemOrdering)
+
+    var last = 0
+    while (it.nonEmpty) {
+      val elem = it.next
+      if (elem._1 - last > 1)
+        empty += Empty(last + 1, elem._1 - 1)
+      last = elem._2
+    }
+    if (last < TABLE_SIZE)
+      empty += Empty(last + 1, TABLE_SIZE - 1)
+    empty
   }
 
   //override def addItem(item: PageElement) = contents += item
@@ -47,8 +61,8 @@ class HtmlTable(elements: List[PageElement]) extends PageVisualization with Layo
 
     def tr = writer.println("    <tr>")
     def `/tr` = writer.println("    </tr>")
-    def td(id: String = "", clazz: String = "", colspan: Int = 1, mouseover: String = "") =
-      writer.print(s"      <td id=$id class='$clazz' colspan=$colspan $mouseover>")
+    def td(id: String = "", clazz: String = "", colspan: Int = 1, title: String = "", mouseover: String = "") =
+      writer.print(s"      <td id=$id class='$clazz' colspan=$colspan title='$title' $mouseover>")
     def `/td` = writer.println("</td>")
 
     def cell(colspan: Int, element: PageElement) = {
@@ -56,7 +70,8 @@ class HtmlTable(elements: List[PageElement]) extends PageVisualization with Layo
         case ItemIdData(_, _, h) => emphasize(h.id)
         case _ => ""
       }
-      td(element.id, element.tdClass, colspan, mouseover)
+      val title = s"Start Byte = ${element.firstByte}, Length = ${element.lastByte - element.firstByte + 1}"
+      td(element.id, element.tdClass, colspan, title, mouseover)
       if (element.content != "")
         writer.print(element.content)
       `/td`
@@ -87,7 +102,7 @@ class HtmlTable(elements: List[PageElement]) extends PageVisualization with Layo
         cellUntil(col, element)
       else if (row > currentRow) {
         // might want to optimize content position...
-        // TODO: Fix continuedString
+        // TODO: Fix continuedString, maybe use another parameter for cellUntil, cell,... to indicate continuedString and make it a field of PageElement
         val continuedString = if (element.content == "") "" else "..."
         cellUntil(COLUMNS, element)
         rowsUntil(row, element)

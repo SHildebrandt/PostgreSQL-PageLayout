@@ -24,7 +24,7 @@ trait LayoutProperties {
 
   val EMPHASIZE_FUNCTION_NAME = "emphasize"
   val UNEMPHASIZE_FUNCTION_NAME = "unemphasize"
-  val EMPHASIZE_STYLE = "backgroundColor = \"orange\""
+  val EMPHASIZE_STYLE = "backgroundColor = \"blue\""
 
   def htmlHead = """<!DOCTYPE html>
                    |<html>""".stripMargin
