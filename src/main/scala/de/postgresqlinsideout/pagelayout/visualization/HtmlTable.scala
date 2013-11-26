@@ -10,58 +10,28 @@ import scala.collection.immutable.IndexedSeq
  *
  * @author Steffen Hildebrandt
  */
-class HtmlTable(elements: List[PageElement]) extends PageVisualization with LayoutProperties {
+class HtmlTable(elements: List[PageElement], table: String, pageNo: Int)
+  extends PageVisualization with LayoutProperties {
 
   import HtmlTable._
 
-  val tableItemOrdering: Ordering[PageElement] = Ordering[Int].on[PageElement](t => t.firstByte)
-  /** elements + Empty elements */
+  override def pageTitle = s"Visualization of Page $pageNo in Table $table"
+
+  /** elements sorted and optionally ingnored range excluded (if IGNORED_BYTE_RANGE != None)*/
   val contents: SortedSet[PageElement] = { 
-    val sorted = SortedSet[PageElement](elements:_*)(tableItemOrdering)
-    val withEmpty = sorted ++ computeEmpty(sorted)
+    val sorted = SortedSet[PageElement](elements:_*)(PageElement.ordering)
 
-    // adapt (shrink) range to cover full rows
-    val fixedRange = IGNORED_BYTE_RANGE map {case (a, b) => ((a + COLUMNS) - (a + COLUMNS) % COLUMNS, b - b % COLUMNS)}
-    fixedRange match {
-      case None => withEmpty
+    IGNORED_BYTE_RANGE match {
+      case None => sorted
       case Some((start, end)) =>
-        val firstElem = (withEmpty find (e => e.firstByte <= start && start <= e.lastByte)).get
-        val lastElem = (withEmpty find (e => e.firstByte <= end && end <= e.lastByte)).get
+        val firstElem = (sorted find (e => e.firstByte <= start && start <= e.lastByte)).get
+        val lastElem = (sorted find (e => e.firstByte <= end && end <= e.lastByte)).get
         if (COMPRESS_INNER_ROWS && firstElem.lastByte >= lastElem.firstByte - 1) // firstElem and lastElem equal or next to each other
-          withEmpty // don't need to cut out just one or two elements, since they will be compressed at any rate
+          sorted // don't need to cut out just one or two elements, since they will be compressed at any rate
         else
-          (withEmpty filter (e => e.lastByte < start || e.firstByte > end)) + Ignored(firstElem.firstByte, lastElem.lastByte)
+          (sorted filter (e => e.lastByte < start || e.firstByte > end)) + Ignored(firstElem.firstByte, lastElem.lastByte)
     }
   }
-
-  def computeEmpty(set: SortedSet[PageElement]): SortedSet[PageElement] = {
-    val it = (set map (e => (e.firstByte, e.lastByte))).iterator
-    var empty = SortedSet[PageElement]()(tableItemOrdering)
-
-    var last = 0
-    while (it.nonEmpty) {
-      val elem = it.next
-      if (elem._1 - last > 1)
-        empty += Empty(last + 1, elem._1 - 1)
-      last = elem._2
-    }
-    if (last < TABLE_SIZE)
-      empty += Empty(last + 1, TABLE_SIZE - 1)
-    empty
-  }
-
-  //override def addItem(item: PageElement) = contents += item
-
-  /*
-  override def getHovers = {
-    contents flatMap { // filter ItemIdData
-      case i : ItemIdData => Some(i)
-      case _              => None
-    } map {c =>
-      s"table td#${c.id}:hover ~ #${c.itemHeader.id} { $EMPHASIZE_STYLE }"
-    } mkString "\n"
-  }
-  */
 
   private def startPos(item: PageElement) = (item.firstByte / COLUMNS + 1, item.firstByte % COLUMNS + 1)
 
@@ -113,7 +83,7 @@ class HtmlTable(elements: List[PageElement]) extends PageVisualization with Layo
     def leftOutRows(element: PageElement) = {
       tr
       val title = s"Start Byte = ${element.firstByte}, Length = ${element.lastByte - element.firstByte + 1}\n${element.title}"
-      td(element.id, element.tdClass + " leftOutRows", COLUMNS, title, "")
+      writer.print(s"      <td id='' class='${element.tdClass} leftOutRows' colspan=$COLUMNS title='$title'></td>")
       `/tr`
     }
 
@@ -155,7 +125,6 @@ class HtmlTable(elements: List[PageElement]) extends PageVisualization with Layo
     contents.foreach(element => {
       content(endPos(element), element)
     })
-    // if (currentColumn != 1) `/tr`
     writer.println(tableEnd)
     writer.println(htmlEnd)
     writer.close()

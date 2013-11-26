@@ -9,6 +9,7 @@ import java.io.File
  * @author Steffen Hildebrandt
  */
 trait PageVisualization {
-  // def addItem(item: PageElement)
+
   def printToFile(to: File)
+
 }

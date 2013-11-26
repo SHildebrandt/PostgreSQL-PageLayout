@@ -1,13 +1,11 @@
 package de.postgresqlinsideout.pagelayout.data
 
-import de.postgresqlinsideout.pagelayout.visualization.{PageElement}
-
 /**
  * Atomic field on a PostgreSQL page, e.g. in the page header or heap tuple header
  *
  * @author Steffen Hildebrandt
  */
-class Field[T](val name: String, val value: T, val size: Int)  {
+class Field[T](val name: String, val value: T, val size: Int) {
 
   override def toString = s"$name=$value"
 

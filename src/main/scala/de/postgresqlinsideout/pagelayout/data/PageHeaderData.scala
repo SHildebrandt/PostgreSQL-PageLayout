@@ -22,10 +22,7 @@ class PageHeaderData(val lsn: Field[String], val checksum: Field[Int], val flags
 
   override def toString() = "PageHeader" + itemString
 
-  //s"PageHeader($lsn, $checksum, $flags, $lower, $upper, $special, $pagesize, $version, $pruneXid)"
-
   override def toList() = List(lsn, checksum, flags, lower, upper, special, pagesize, version, pruneXid)
-
 }
 
 object PageHeaderData {
@@ -42,5 +39,4 @@ object PageHeaderData {
       new Field("pagesize", pagesize, 1),
       new Field("version", version, 1),
       new Field("pruneXid", pruneXid, 4))
-
 }

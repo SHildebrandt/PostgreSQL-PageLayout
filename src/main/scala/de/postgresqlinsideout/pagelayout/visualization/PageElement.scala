@@ -12,11 +12,16 @@ sealed trait PageElement {
   val firstByte: Int
   val lastByte: Int
   val content: String
-  def title = content // the small box that pops up if you stay on a cell for a bit longer
+
   /**
    * Content of this PageElement if in the following rows (if it reaches until there)
    */
   val contentContinued: String
+
+  /**
+   * the small box that pops up if you stay on a cell for a bit longer
+   */
+  def title = content
 
   val id: String = "id" + firstByte.toString
   val tdClass: String
@@ -61,9 +66,16 @@ case class Empty(firstByte: Int, lastByte: Int) extends PageElement {
   val tdClass = "empty"
 }
 
+/**
+ * This is actually not a PageElement. It just indicates an ignored range in the Visualization.
+ */
 case class Ignored(firstByte: Int, lastByte: Int) extends PageElement {
   val content = ""
   val contentContinued = ""
   override val title = "Page content ignored for visualization"
   val tdClass = "ignored"
+}
+
+object PageElement {
+  val ordering: Ordering[PageElement] = Ordering[Int].on[PageElement](t => t.firstByte)
 }

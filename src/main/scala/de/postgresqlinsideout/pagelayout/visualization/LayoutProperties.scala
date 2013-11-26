@@ -43,7 +43,7 @@ trait LayoutProperties {
    * (might make sense for tables with many columns,
    * where COMPRESS_INNER_ROWS doesn't keep the visualization small enough)
    */
-  val IGNORED_BYTE_RANGE: Option[(Int, Int)] = Some(1000, 6000)
+  val IGNORED_BYTE_RANGE: Option[(Int, Int)] = Some(1500, 7000)
 
   def htmlHead = """<!DOCTYPE html>
                    |<html>""".stripMargin
@@ -66,11 +66,15 @@ trait LayoutProperties {
                   |</script>
                   |</head>""".stripMargin
 
+
+  def pageTitle = "Visualization of a Database Page"
+
   def tableHead = {
     val body = "<body>\n"
+    val title = s"  <h1>$pageTitle</h1>\n"
     val table = "  <table class='center'>\n"
     val cols = (1 to COLUMNS) map (_ => s"    <col class='fixedWidth'/>") mkString "\n"
-    body + table + cols
+    body + /*title + */ table + cols
   }
 
   def tableEnd = "  </table>\n</body>"

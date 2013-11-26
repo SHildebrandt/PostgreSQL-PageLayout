@@ -6,6 +6,8 @@ import de.postgresqlinsideout.pagelayout.visualization.PageHeader
 import de.postgresqlinsideout.pagelayout.visualization.ItemHeader
 import de.postgresqlinsideout.pagelayout.visualization.Item
 import scala.slick.session.Database
+import scala.collection.SortedSet
+import scala.collection.mutable.ListBuffer
 
 /**
  * A PostgreSQL page and its contents.
@@ -20,7 +22,7 @@ class Page(db: Database, table: String, pageNo: Int) {
   private lazy val pageHeaderData = DBAccess.getPageHeader(db, table, pageNo)
   private lazy val heapPageItems = DBAccess.getHeapPageItems(db, table, pageNo)
 
-  def getPageVisualization: PageVisualization = new HtmlTable(pageElements)
+  def getPageVisualization: PageVisualization = new HtmlTable(pageElements, table, pageNo)
 
   /**
    * Returns all elements in this page as a List of PageElement
@@ -29,6 +31,7 @@ class Page(db: Database, table: String, pageNo: Int) {
    */
   lazy val pageElements = {
     val pageHeader = PageHeader(PAGE_HEADER_DATA_START, PAGE_HEADER_DATA_END, pageHeaderData)
+    val pageSize = pageHeaderData.pagesize.value
     val otherElements = heapPageItems flatMap {hpi =>
       // we have to build "backwards" here to set the pointers
       val item = Item(hpi.firstByte + DATA_HEADER_SIZE, hpi.lastByte, hpi)
@@ -36,7 +39,9 @@ class Page(db: Database, table: String, pageNo: Int) {
       val itemIdData = ItemIdData(hpi.itemIdDataStart, hpi.itemIdDataEnd, itemHeader)
       List(itemIdData, itemHeader, item)
     }
-    pageHeader :: otherElements
+    val content = pageHeader :: otherElements
+    val empty = getEmptySpace(content, pageSize)
+    empty ::: content
   }
 
 
@@ -59,7 +64,22 @@ class Page(db: Database, table: String, pageNo: Int) {
     case _ => None
   }
 
-  //def getEmptySpace ...
+  def getEmptySpace(allNonEmptyElements: List[PageElement], tableSize: Int): List[PageElement] = {
+    val sorted = SortedSet[PageElement](allNonEmptyElements:_*)(PageElement.ordering)
+    val it = (sorted map (e => (e.firstByte, e.lastByte))).iterator
+
+    val empty = ListBuffer[Empty]()
+    var last = 0
+    while (it.nonEmpty) {
+      val elem = it.next
+      if (elem._1 - last > 1)
+        empty += Empty(last + 1, elem._1 - 1)
+      last = elem._2
+    }
+    if (last < tableSize)
+      empty += Empty(last + 1, tableSize - 1)
+    empty.toList
+  }
 }
 
 object Page {

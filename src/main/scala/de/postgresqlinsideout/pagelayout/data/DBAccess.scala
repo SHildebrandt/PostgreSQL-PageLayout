@@ -55,6 +55,10 @@ object DBAccess {
     items
   }
 
+  def getContentForCtid(db: Database, table: String, ctid: (Int, Int)) = db withSession {
+    StaticQuery.queryNA[List[String]](s"SELECT * FROM $table WHERE ctid = '$ctid'").list.head
+  }
+
   def getPageHeaderString(db: Database, table: String, pageNo: Int): List[String] = db withSession {
     //StaticQuery.queryNA[String](s"SELECT * FROM pg_tables").list()
     val q = StaticQuery.queryNA[String](s"SELECT * FROM page_header(get_raw_page('$table', $pageNo))")
@@ -64,9 +68,5 @@ object DBAccess {
 
   def getContent(db: Database, table: String): List[List[String]] = db withSession {
     StaticQuery.queryNA[List[String]](s"SELECT * FROM '$table'").list
-  }
-
-  def getContentForCtid(db: Database, table: String, ctid: (Int, Int)) = db withSession {
-    StaticQuery.queryNA[List[String]](s"SELECT * FROM $table WHERE ctid = '$ctid'").list.head
   }
 }
