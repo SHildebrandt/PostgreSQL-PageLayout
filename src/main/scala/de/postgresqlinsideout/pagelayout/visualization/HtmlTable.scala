@@ -20,14 +20,17 @@ class HtmlTable(elements: List[PageElement]) extends PageVisualization with Layo
     val sorted = SortedSet[PageElement](elements:_*)(tableItemOrdering)
     val withEmpty = sorted ++ computeEmpty(sorted)
 
-    // TODO: improve that... ignore range should be cut to multiple of row size and something similar to leftOutRows might be helpful, too
-    val fixedRange = IGNORED_BYTE_RANGE map {case (a, b) => (a - a % COLUMNS, (b + COLUMNS) - (b + COLUMNS) % COLUMNS)}
+    // adapt (shrink) range to cover full rows
+    val fixedRange = IGNORED_BYTE_RANGE map {case (a, b) => ((a + COLUMNS) - (a + COLUMNS) % COLUMNS, b - b % COLUMNS)}
     fixedRange match {
       case None => withEmpty
       case Some((start, end)) =>
-        val firstElem = (withEmpty find (e => e.firstByte <= start && start <= e.lastByte)).get.firstByte
-        val lastElem = (withEmpty find (e => e.firstByte <= end && end <= e.lastByte)).get.lastByte
-        (withEmpty filter (e => e.lastByte < start || e.firstByte > end)) + Ignored(firstElem, lastElem)
+        val firstElem = (withEmpty find (e => e.firstByte <= start && start <= e.lastByte)).get
+        val lastElem = (withEmpty find (e => e.firstByte <= end && end <= e.lastByte)).get
+        if (COMPRESS_INNER_ROWS && firstElem.lastByte >= lastElem.firstByte - 1) // firstElem and lastElem equal or next to each other
+          withEmpty // don't need to cut out just one or two elements, since they will be compressed at any rate
+        else
+          (withEmpty filter (e => e.lastByte < start || e.firstByte > end)) + Ignored(firstElem.firstByte, lastElem.lastByte)
     }
   }
 
@@ -71,7 +74,7 @@ class HtmlTable(elements: List[PageElement]) extends PageVisualization with Layo
 
     def tr = writer.println("    <tr>")
     def `/tr` = writer.println("    </tr>")
-    def td(id: String = "", clazz: String = "", colspan: Int = 1, title: String = "", mouseover: String = "") =
+    def td(id: String, clazz: String = "", colspan: Int = 1, title: String = "", mouseover: String = "") =
       writer.print(s"      <td id=$id class='$clazz' colspan=$colspan title='$title' $mouseover><div class='td'>")
     def `/td` = writer.println("</div></td>")
 
@@ -108,7 +111,10 @@ class HtmlTable(elements: List[PageElement]) extends PageVisualization with Layo
     }
 
     def leftOutRows(element: PageElement) = {
-      writer.println(s"    <tr><td class='${element.tdClass} leftOutRow' colspan=$COLUMNS></td></tr>")
+      tr
+      val title = s"Start Byte = ${element.firstByte}, Length = ${element.lastByte - element.firstByte + 1}\n${element.title}"
+      td(element.id, element.tdClass + " leftOutRows", COLUMNS, title, "")
+      `/tr`
     }
 
     def content(endPos: Pos, element: PageElement) = {

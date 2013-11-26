@@ -1,5 +1,7 @@
 package de.postgresqlinsideout.pagelayout.data
 
+import scala.slick.session.Database
+
 
 /**
  * Representation of a heap page item in PostgreSQL
@@ -35,6 +37,7 @@ class HeapPageItem(val lp: Field[Int], val lpOff: Field[Int], val lpFlags: Field
    * So this variable has to be set after the actual instantiation of the object.
    * Another possibility would have been to create a wrapper class with this table field, but that's probably overkill.
    */
+  var fromDB: Option[Database] = None
   var fromTable: Option[String] = None
 
   def toList() = List(lp, lpOff, lpFlags, lpLen, tXmin, tXmax, tField3,
@@ -45,7 +48,7 @@ class HeapPageItem(val lp: Field[Int], val lpOff: Field[Int], val lpFlags: Field
   val itemIdDataStart = Page.ITEM_ID_DATA_START + (lp.value - 1) * 4
   val itemIdDataEnd = itemIdDataStart + 3
   val firstByte = lpOff.value
-  val lastByte = firstByte + lpLen.value
+  val lastByte = firstByte + lpLen.value - 1
 }
 
 object HeapPageItem {

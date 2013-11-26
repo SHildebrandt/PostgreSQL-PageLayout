@@ -16,11 +16,18 @@ trait LayoutProperties {
   
   val TABLE_SIZE = 8192 // bytes
   val COLUMNS = 64
-  val ROWS = TABLE_SIZE / COLUMNS
+  val ROWS = {
+    assert(TABLE_SIZE % COLUMNS == 0, "Please choose a COLUMNS value that makes sense!!")
+    TABLE_SIZE / COLUMNS
+  }
 
-  val TABLE_WIDTH = 1000 // px
-  val ROW_HEIGHT = 20 // px
-  val COLUMN_WIDTH = TABLE_WIDTH / COLUMNS
+  val TABLE_WIDTH = 16 * 64 // px
+  val ROW_HEIGHT = 10 // px
+  val COLUMN_WIDTH = {
+    assert(TABLE_WIDTH % COLUMNS == 0,
+      "Please choose a TABLE_WIDTH value that fits! (is a multiple of the number of COLUMNS)")
+    TABLE_WIDTH / COLUMNS
+  }
 
   val EMPHASIZE_FUNCTION_NAME = "emphasize"
   val UNEMPHASIZE_FUNCTION_NAME = "unemphasize"

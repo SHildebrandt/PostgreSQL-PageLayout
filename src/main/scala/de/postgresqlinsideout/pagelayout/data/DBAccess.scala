@@ -11,9 +11,6 @@ import scala.collection.mutable.ListBuffer
  */
 object DBAccess {
 
-  lazy val db = Database.forURL("jdbc:postgresql://localhost/dell", user = "postgres", password = "postgres")
-  //lazy val db = Database.forURL("jdbc:postgresql://localhost/booktown", user = "postgres", password = "postgres")
-
   // initialize PostgreSQL driver
   Class.forName("org.postgresql.Driver")
 
@@ -42,31 +39,34 @@ object DBAccess {
     case _ => throw new Exception("Could not parse Int-Tuple: " + s)
   }
 
-  def getPageHeader(table: String, pageNo: Int): PageHeaderData = db withSession {
+  def getPageHeader(db: Database, table: String, pageNo: Int): PageHeaderData = db withSession {
     val result = StaticQuery.queryNA[PageHeaderData](s"SELECT * FROM page_header(get_raw_page('$table', $pageNo))").list
     if (result.size != 1)
       throw new Exception("Unexpected result size of function page_header")
     result(0)
   }
 
-  def getHeapPageItems(table: String, pageNo: Int): List[HeapPageItem] = db withSession {
+  def getHeapPageItems(db: Database, table: String, pageNo: Int): List[HeapPageItem] = db withSession {
     val items = StaticQuery.queryNA[HeapPageItem](s"SELECT * FROM heap_page_items(get_raw_page('$table', $pageNo))").list
-    items foreach (_.fromTable = Some(table))
+    items foreach { i =>
+      i.fromDB = Some(db)
+      i.fromTable = Some(table)
+    }
     items
   }
 
-  def getPageHeaderString(table: String, pageNo: Int): List[String] = db withSession {
+  def getPageHeaderString(db: Database, table: String, pageNo: Int): List[String] = db withSession {
     //StaticQuery.queryNA[String](s"SELECT * FROM pg_tables").list()
     val q = StaticQuery.queryNA[String](s"SELECT * FROM page_header(get_raw_page('$table', $pageNo))")
     println(q.getStatement)
     q.list()
   }
 
-  def getContent(table: String): List[List[String]] = db withSession {
+  def getContent(db: Database, table: String): List[List[String]] = db withSession {
     StaticQuery.queryNA[List[String]](s"SELECT * FROM '$table'").list
   }
 
-  def getContentForCtid(table: String, ctid: (Int, Int)) = db withSession {
+  def getContentForCtid(db: Database, table: String, ctid: (Int, Int)) = db withSession {
     StaticQuery.queryNA[List[String]](s"SELECT * FROM $table WHERE ctid = '$ctid'").list.head
   }
 }

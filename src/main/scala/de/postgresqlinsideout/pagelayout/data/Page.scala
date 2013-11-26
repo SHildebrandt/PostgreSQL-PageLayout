@@ -5,6 +5,7 @@ import de.postgresqlinsideout.pagelayout.visualization.ItemIdData
 import de.postgresqlinsideout.pagelayout.visualization.PageHeader
 import de.postgresqlinsideout.pagelayout.visualization.ItemHeader
 import de.postgresqlinsideout.pagelayout.visualization.Item
+import scala.slick.session.Database
 
 /**
  * A PostgreSQL page and its contents.
@@ -13,11 +14,11 @@ import de.postgresqlinsideout.pagelayout.visualization.Item
  *
  * @author Steffen Hildebrandt
  */
-class Page(dbTable: String, pageNo: Int) {
+class Page(db: Database, table: String, pageNo: Int) {
   import Page._
 
-  private lazy val pageHeaderData = DBAccess.getPageHeader(dbTable, pageNo)
-  private lazy val heapPageItems = DBAccess.getHeapPageItems(dbTable, pageNo)
+  private lazy val pageHeaderData = DBAccess.getPageHeader(db, table, pageNo)
+  private lazy val heapPageItems = DBAccess.getHeapPageItems(db, table, pageNo)
 
   def getPageVisualization: PageVisualization = new HtmlTable(pageElements)
 

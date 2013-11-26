@@ -44,10 +44,11 @@ case class ItemHeader(firstByte: Int, lastByte: Int, item: Item) extends PageEle
 }
 
 case class Item(firstByte: Int, lastByte: Int, heapPageItem: HeapPageItem) extends PageElement {
+  val db = heapPageItem.fromDB
   val table = heapPageItem.fromTable
-  lazy val content = table match {
-    case Some(t) => s"$t(${DBAccess.getContentForCtid(t, heapPageItem.tCtid.value) mkString ","})"
-    case None => s"Item with ctid = ${heapPageItem.tCtid.value}"
+  lazy val content = (db, table) match {
+    case (Some(d), Some(t)) => s"$t(${DBAccess.getContentForCtid(d, t, heapPageItem.tCtid.value) mkString ","})"
+    case _ => s"Item with ctid = ${heapPageItem.tCtid.value}"
   }
   val contentContinued = "..."
   val tdClass = "item"
@@ -56,11 +57,13 @@ case class Item(firstByte: Int, lastByte: Int, heapPageItem: HeapPageItem) exten
 case class Empty(firstByte: Int, lastByte: Int) extends PageElement {
   val content = ""
   val contentContinued = ""
+  override val title = "Empty Space"
   val tdClass = "empty"
 }
 
 case class Ignored(firstByte: Int, lastByte: Int) extends PageElement {
   val content = ""
   val contentContinued = ""
+  override val title = "Page content ignored for visualization"
   val tdClass = "ignored"
 }
