@@ -7,12 +7,15 @@
   col.fixedWidth { width:16px; }
 </style>
 <script language="javascript" type="text/javascript">
-function emphasize(id) {
-   document.getElementById(id).className += " emphasize";
+function emphasize(name) {
+   var elems = document.getElementsByName(name);
+   for (var i = 0; i < elems.length; i++)
+       elems[i].classList.add("emphasize");
 }
-function unemphasize(id) {
-   var c = document.getElementById(id).className;
-   document.getElementById(id).className = c.substring(0, c.length - 10);
+function unemphasize(name) {
+   var elems = document.getElementsByName(name);
+   for (var i = 0; i < elems.length; i++)
+       elems[i].classList.remove("emphasize");
 }
 </script>
 </head>
@@ -83,104 +86,104 @@ function unemphasize(id) {
     <col class='fixedWidth'/>
     <col class='fixedWidth'/>
     <tr>
-      <td id=id0 class='pageheader' colspan=24 title='Start Byte = 0, Length = 24
+      <td name='id0' class='pageheader' colspan=24 title='Start Byte = 0, Length = 24
 PageHeader(lsn=0/294B778,checksum=0,flags=0,lower=84,upper=7328,special=8192,pagesize=8192,version=4,pruneXid=0)' ><div class='td'>PageHeader</div></td>
-      <td id=id24 class='empty' colspan=20 title='Start Byte = 24, Length = 20
+      <td name='id24' class='empty' colspan=20 title='Start Byte = 24, Length = 20
 Empty Space' ><div class='td'></div></td>
-      <td id=id44 class='itemiddata' colspan=4 title='Start Byte = 44, Length = 4
+      <td name='id44' class='itemiddata' colspan=4 title='Start Byte = 44, Length = 4
 Pointer to Byte 7848' onmouseover="emphasize('id7848')" onmouseout="unemphasize('id7848')"><div class='td'>--> 7848</div></td>
-      <td id=id48 class='empty' colspan=8 title='Start Byte = 48, Length = 8
+      <td name='id48' class='empty' colspan=8 title='Start Byte = 48, Length = 8
 Empty Space' ><div class='td'></div></td>
-      <td id=id56 class='itemiddata' colspan=4 title='Start Byte = 56, Length = 4
+      <td name='id56' class='itemiddata' colspan=4 title='Start Byte = 56, Length = 4
 Pointer to Byte 7672' onmouseover="emphasize('id7672')" onmouseout="unemphasize('id7672')"><div class='td'>--> 7672</div></td>
-      <td id=id60 class='empty' colspan=4 title='Start Byte = 60, Length = 8
+      <td name='id60' class='empty' colspan=4 title='Start Byte = 60, Length = 8
 Empty Space' ><div class='td'></div></td>
     </tr>
     <tr>
-      <td id=id60 class='empty' colspan=4 title='Start Byte = 60, Length = 8
+      <td name='id60' class='empty' colspan=4 title='Start Byte = 60, Length = 8
 Empty Space' ><div class='td'></div></td>
-      <td id=id68 class='itemiddata' colspan=4 title='Start Byte = 68, Length = 4
+      <td name='id68' class='itemiddata' colspan=4 title='Start Byte = 68, Length = 4
 Pointer to Byte 7504' onmouseover="emphasize('id7504')" onmouseout="unemphasize('id7504')"><div class='td'>--> 7504</div></td>
-      <td id=id72 class='itemiddata' colspan=4 title='Start Byte = 72, Length = 4
+      <td name='id72' class='itemiddata' colspan=4 title='Start Byte = 72, Length = 4
 Pointer to Byte 7448' onmouseover="emphasize('id7448')" onmouseout="unemphasize('id7448')"><div class='td'>--> 7448</div></td>
-      <td id=id76 class='itemiddata' colspan=4 title='Start Byte = 76, Length = 4
+      <td name='id76' class='itemiddata' colspan=4 title='Start Byte = 76, Length = 4
 Pointer to Byte 7392' onmouseover="emphasize('id7392')" onmouseout="unemphasize('id7392')"><div class='td'>--> 7392</div></td>
-      <td id=id80 class='empty' colspan=48 title='Start Byte = 80, Length = 7312
+      <td name='id80' class='empty' colspan=48 title='Start Byte = 80, Length = 7312
 Empty Space' ><div class='td'></div></td>
     </tr>
     <tr>
-      <td id='' class='empty leftOutRows' colspan=64 title='Start Byte = 80, Length = 7312
+      <td name='' class='empty leftOutRows' colspan=64 title='Start Byte = 80, Length = 7312
 Empty Space'></td>    </tr>
     <tr>
-      <td id=id80 class='empty' colspan=32 title='Start Byte = 80, Length = 7312
+      <td name='id80' class='empty' colspan=32 title='Start Byte = 80, Length = 7312
 Empty Space' ><div class='td'></div></td>
-      <td id=id7392 class='itemheader' colspan=23 title='Start Byte = 7392, Length = 23
+      <td name='id7392' class='itemheader' colspan=23 title='Start Byte = 7392, Length = 23
 HeapPageItem(lp=14,lpOff=7392,lpFlags=1,lpLen=52,tXmin=2964,tXmax=0,tField3=0,tCtid=(0,14),tInfomask2=4,tInfomask=2306,tHoff=24,tBits=null,tOid=0)' ><div class='td'>ItemHeader</div></td>
-      <td id=id7415 class='item' colspan=9 title='Start Byte = 7415, Length = 29
+      <td name='id7415' class='item' colspan=9 title='Start Byte = 7415, Length = 29
 41478,Perl Cookbook,7806,4' ><div class='td'>...</div></td>
     </tr>
     <tr>
-      <td id=id7415 class='item' colspan=20 title='Start Byte = 7415, Length = 29
+      <td name='id7415' class='item' colspan=20 title='Start Byte = 7415, Length = 29
 41478,Perl Cookbook,7806,4' ><div class='td'>41478,Perl Cookbook,7806,4</div></td>
-      <td id=id7444 class='empty' colspan=4 title='Start Byte = 7444, Length = 4
+      <td name='id7444' class='empty' colspan=4 title='Start Byte = 7444, Length = 4
 Empty Space' ><div class='td'></div></td>
-      <td id=id7448 class='itemheader' colspan=23 title='Start Byte = 7448, Length = 23
+      <td name='id7448' class='itemheader' colspan=23 title='Start Byte = 7448, Length = 23
 HeapPageItem(lp=13,lpOff=7448,lpFlags=1,lpLen=52,tXmin=2964,tXmax=0,tField3=0,tCtid=(0,13),tInfomask2=4,tInfomask=2306,tHoff=24,tBits=null,tOid=0)' ><div class='td'>ItemHeader</div></td>
-      <td id=id7471 class='item' colspan=17 title='Start Byte = 7471, Length = 29
+      <td name='id7471' class='item' colspan=17 title='Start Byte = 7471, Length = 29
 41477,Learning Python,7805,4' ><div class='td'>41477,Learning Python,7805,4</div></td>
     </tr>
     <tr>
-      <td id=id7471 class='item' colspan=12 title='Start Byte = 7471, Length = 29
+      <td name='id7471' class='item' colspan=12 title='Start Byte = 7471, Length = 29
 41477,Learning Python,7805,4' ><div class='td'>...</div></td>
-      <td id=id7500 class='empty' colspan=4 title='Start Byte = 7500, Length = 4
+      <td name='id7500' class='empty' colspan=4 title='Start Byte = 7500, Length = 4
 Empty Space' ><div class='td'></div></td>
-      <td id=id7504 class='itemheader' colspan=23 title='Start Byte = 7504, Length = 23
+      <td name='id7504' class='itemheader' colspan=23 title='Start Byte = 7504, Length = 23
 HeapPageItem(lp=12,lpOff=7504,lpFlags=1,lpLen=56,tXmin=2964,tXmax=0,tField3=0,tCtid=(0,12),tInfomask2=4,tInfomask=2306,tHoff=24,tBits=null,tOid=0)' ><div class='td'>ItemHeader</div></td>
-      <td id=id7527 class='item' colspan=25 title='Start Byte = 7527, Length = 33
+      <td name='id7527' class='item' colspan=25 title='Start Byte = 7527, Length = 33
 41473,Programming Python,7805,4' ><div class='td'>41473,Programming Python,7805,4</div></td>
     </tr>
     <tr>
-      <td id=id7527 class='item' colspan=8 title='Start Byte = 7527, Length = 33
+      <td name='id7527' class='item' colspan=8 title='Start Byte = 7527, Length = 33
 41473,Programming Python,7805,4' ><div class='td'>...</div></td>
-      <td id=id7560 class='empty' colspan=56 title='Start Byte = 7560, Length = 112
+      <td name='id7560' class='empty' colspan=56 title='Start Byte = 7560, Length = 112
 Empty Space' ><div class='td'></div></td>
     </tr>
     <tr>
-      <td id=id7560 class='empty' colspan=56 title='Start Byte = 7560, Length = 112
+      <td name='id7560' class='empty' colspan=56 title='Start Byte = 7560, Length = 112
 Empty Space' ><div class='td'></div></td>
-      <td id=id7672 class='itemheader' colspan=8 title='Start Byte = 7672, Length = 23
+      <td name='id7672' class='itemheader' colspan=8 title='Start Byte = 7672, Length = 23
 HeapPageItem(lp=9,lpOff=7672,lpFlags=1,lpLen=60,tXmin=2964,tXmax=0,tField3=0,tCtid=(0,9),tInfomask2=4,tInfomask=2306,tHoff=24,tBits=null,tOid=0)' ><div class='td'></div></td>
     </tr>
     <tr>
-      <td id=id7672 class='itemheader' colspan=15 title='Start Byte = 7672, Length = 23
+      <td name='id7672' class='itemheader' colspan=15 title='Start Byte = 7672, Length = 23
 HeapPageItem(lp=9,lpOff=7672,lpFlags=1,lpLen=60,tXmin=2964,tXmax=0,tField3=0,tCtid=(0,9),tInfomask2=4,tInfomask=2306,tHoff=24,tBits=null,tOid=0)' ><div class='td'>ItemHeader</div></td>
-      <td id=id7695 class='item' colspan=37 title='Start Byte = 7695, Length = 37
+      <td name='id7695' class='item' colspan=37 title='Start Byte = 7695, Length = 37
 1234,The Velveteen Rabbit,25041,3' ><div class='td'>1234,The Velveteen Rabbit,25041,3</div></td>
-      <td id=id7732 class='empty' colspan=12 title='Start Byte = 7732, Length = 116
+      <td name='id7732' class='empty' colspan=12 title='Start Byte = 7732, Length = 116
 Empty Space' ><div class='td'></div></td>
     </tr>
     <tr>
-      <td id='' class='empty leftOutRows' colspan=64 title='Start Byte = 7732, Length = 116
+      <td name='' class='empty leftOutRows' colspan=64 title='Start Byte = 7732, Length = 116
 Empty Space'></td>    </tr>
     <tr>
-      <td id=id7732 class='empty' colspan=40 title='Start Byte = 7732, Length = 116
+      <td name='id7732' class='empty' colspan=40 title='Start Byte = 7732, Length = 116
 Empty Space' ><div class='td'></div></td>
-      <td id=id7848 class='itemheader' colspan=23 title='Start Byte = 7848, Length = 23
+      <td name='id7848' class='itemheader' colspan=23 title='Start Byte = 7848, Length = 23
 HeapPageItem(lp=6,lpOff=7848,lpFlags=1,lpLen=60,tXmin=2964,tXmax=0,tField3=0,tCtid=(0,6),tInfomask2=4,tInfomask=2306,tHoff=24,tBits=null,tOid=0)' ><div class='td'>ItemHeader</div></td>
-      <td id=id7871 class='item' colspan=1 title='Start Byte = 7871, Length = 37
+      <td name='id7871' class='item' colspan=1 title='Start Byte = 7871, Length = 37
 25908,Franklin in the Dark,15990,2' ><div class='td'>...</div></td>
     </tr>
     <tr>
-      <td id=id7871 class='item' colspan=36 title='Start Byte = 7871, Length = 37
+      <td name='id7871' class='item' colspan=36 title='Start Byte = 7871, Length = 37
 25908,Franklin in the Dark,15990,2' ><div class='td'>25908,Franklin in the Dark,15990,2</div></td>
-      <td id=id7908 class='empty' colspan=28 title='Start Byte = 7908, Length = 284
+      <td name='id7908' class='empty' colspan=28 title='Start Byte = 7908, Length = 284
 Empty Space' ><div class='td'></div></td>
     </tr>
     <tr>
-      <td id='' class='empty leftOutRows' colspan=64 title='Start Byte = 7908, Length = 284
+      <td name='' class='empty leftOutRows' colspan=64 title='Start Byte = 7908, Length = 284
 Empty Space'></td>    </tr>
     <tr>
-      <td id=id7908 class='empty' colspan=64 title='Start Byte = 7908, Length = 284
+      <td name='id7908' class='empty' colspan=64 title='Start Byte = 7908, Length = 284
 Empty Space' ><div class='td'></div></td>
     </tr>
   </table>

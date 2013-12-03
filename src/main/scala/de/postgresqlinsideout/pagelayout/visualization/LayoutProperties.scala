@@ -56,12 +56,15 @@ trait LayoutProperties {
                   |<title>PostgreSQL PageLayout</title>
                   |$style
                   |<script language="javascript" type="text/javascript">
-                  |function $EMPHASIZE_FUNCTION_NAME(id) {
-                  |   document.getElementById(id).className += " emphasize";
+                  |function $EMPHASIZE_FUNCTION_NAME(name) {
+                  |   var elems = document.getElementsByName(name);
+                  |   for (var i = 0; i < elems.length; i++)
+                  |       elems[i].classList.add("emphasize");
                   |}
-                  |function $UNEMPHASIZE_FUNCTION_NAME(id) {
-                  |   var c = document.getElementById(id).className;
-                  |   document.getElementById(id).className = c.substring(0, c.length - 10);
+                  |function $UNEMPHASIZE_FUNCTION_NAME(name) {
+                  |   var elems = document.getElementsByName(name);
+                  |   for (var i = 0; i < elems.length; i++)
+                  |       elems[i].classList.remove("emphasize");
                   |}
                   |</script>
                   |</head>""".stripMargin
@@ -81,6 +84,6 @@ trait LayoutProperties {
 
   def htmlEnd = "</html>"
 
-  def emphasize(id: String) = // escaping quotes in String interpolations doesn't work.....
-    s"onmouseover=${'"'}$EMPHASIZE_FUNCTION_NAME('$id')${'"'} onmouseout=${'"'}$UNEMPHASIZE_FUNCTION_NAME('$id')${'"'}"
+  def emphasize(name: String) = // escaping quotes in String interpolations doesn't work.....
+    s"onmouseover=${'"'}$EMPHASIZE_FUNCTION_NAME('$name')${'"'} onmouseout=${'"'}$UNEMPHASIZE_FUNCTION_NAME('$name')${'"'}"
 }

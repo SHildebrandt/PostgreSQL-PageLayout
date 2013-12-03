@@ -23,7 +23,7 @@ sealed trait PageElement {
    */
   def title = content
 
-  val id: String = "id" + firstByte.toString
+  val name: String = "id" + firstByte.toString
   val tdClass: String
 }
 

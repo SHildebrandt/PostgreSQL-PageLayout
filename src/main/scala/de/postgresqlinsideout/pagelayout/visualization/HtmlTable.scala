@@ -44,17 +44,17 @@ class HtmlTable(elements: List[PageElement], table: String, pageNo: Int)
 
     def tr = writer.println("    <tr>")
     def `/tr` = writer.println("    </tr>")
-    def td(id: String, clazz: String = "", colspan: Int = 1, title: String = "", mouseover: String = "") =
-      writer.print(s"      <td id=$id class='$clazz' colspan=$colspan title='$title' $mouseover><div class='td'>")
+    def td(name: String, clazz: String = "", colspan: Int = 1, title: String = "", mouseover: String = "") =
+      writer.print(s"      <td name='$name' class='$clazz' colspan=$colspan title='$title' $mouseover><div class='td'>")
     def `/td` = writer.println("</div></td>")
 
     def cell(colspan: Int, element: PageElement, useContinuedContent: Boolean) = {
       val mouseover = element match {
-        case ItemIdData(_, _, h) => emphasize(h.id)
+        case ItemIdData(_, _, h) => emphasize(h.name)
         case _ => ""
       }
       val title = s"Start Byte = ${element.firstByte}, Length = ${element.lastByte - element.firstByte + 1}\n${element.title}"
-      td(element.id, element.tdClass, colspan, title, mouseover)
+      td(element.name, element.tdClass, colspan, title, mouseover)
       if (!useContinuedContent)
         writer.print(element.content)
       else
@@ -83,7 +83,7 @@ class HtmlTable(elements: List[PageElement], table: String, pageNo: Int)
     def leftOutRows(element: PageElement) = {
       tr
       val title = s"Start Byte = ${element.firstByte}, Length = ${element.lastByte - element.firstByte + 1}\n${element.title}"
-      writer.print(s"      <td id='' class='${element.tdClass} leftOutRows' colspan=$COLUMNS title='$title'></td>")
+      writer.print(s"      <td name='' class='${element.tdClass} leftOutRows' colspan=$COLUMNS title='$title'></td>")
       `/tr`
     }
 
