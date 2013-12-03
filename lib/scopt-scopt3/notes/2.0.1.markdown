@@ -1,3 +1,0 @@
-- Fixes Unit opt. [#1][1]
-
-  [1]: https://github.com/scopt/scopt/issues/1

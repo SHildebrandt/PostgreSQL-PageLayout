@@ -45,7 +45,7 @@ class HtmlTable(elements: List[PageElement], table: String, pageNo: Int)
     def tr = writer.println("    <tr>")
     def `/tr` = writer.println("    </tr>")
     def td(name: String, clazz: String = "", colspan: Int = 1, title: String = "", mouseover: String = "") =
-      writer.print(s"      <td name='$name' class='$clazz' colspan=$colspan title='$title' $mouseover><div class='td'>")
+      writer.print(s"      <td class='$clazz' name='$name' colspan=$colspan title='$title' $mouseover><div class='td'>")
     def `/td` = writer.println("</div></td>")
 
     def cell(colspan: Int, element: PageElement, useContinuedContent: Boolean) = {
