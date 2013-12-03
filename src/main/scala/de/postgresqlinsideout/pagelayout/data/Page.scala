@@ -22,7 +22,10 @@ class Page(db: Database, table: String, pageNo: Int) {
   private lazy val pageHeaderData = DBAccess.getPageHeader(db, table, pageNo)
   protected lazy val heapPageItems = DBAccess.getHeapPageItems(db, table, pageNo)
 
-  def getPageVisualization: PageVisualization = new HtmlTable(pageElements, table, pageNo)
+  def getPageVisualization(withLayout: LayoutProperties = new LayoutProperties {}): PageVisualization =
+    new HtmlTable(pageElements, table, pageNo) {
+      override val layout = withLayout
+    }
 
   /**
    * Returns all elements in this page as a List of PageElement

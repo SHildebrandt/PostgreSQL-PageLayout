@@ -10,15 +10,17 @@ import scala.collection.immutable.IndexedSeq
  *
  * @author Steffen Hildebrandt
  */
-class HtmlTable(elements: List[PageElement], table: String, pageNo: Int)
-  extends PageVisualization with LayoutProperties {
+class HtmlTable(elements: List[PageElement], table: String, pageNo: Int) extends PageVisualization {
 
   import HtmlTable._
 
-  override def pageTitle = s"Visualization of Page $pageNo in Table $table"
+  val layout = new LayoutProperties {}
+  import layout._
+
+  //def pageTitle = s"Visualization of Page $pageNo in Table $table"
 
   /** elements sorted and optionally ingnored range excluded (if IGNORED_BYTE_RANGE != None)*/
-  val contents: SortedSet[PageElement] = { 
+  lazy val contents: SortedSet[PageElement] = {
     val sorted = SortedSet[PageElement](elements:_*)(PageElement.ordering)
 
     IGNORED_BYTE_RANGE match {
@@ -83,7 +85,7 @@ class HtmlTable(elements: List[PageElement], table: String, pageNo: Int)
     def leftOutRows(element: PageElement) = {
       tr
       val title = s"Start Byte = ${element.firstByte}, Length = ${element.lastByte - element.firstByte + 1}\n${element.title}"
-      writer.print(s"      <td name='' class='${element.tdClass} leftOutRows' colspan=$COLUMNS title='$title'></td>")
+      writer.print(s"      <td name=${element.name} class='${element.tdClass} leftOutRows' colspan=$COLUMNS title='(rows compressed)\n$title'></td>")
       `/tr`
     }
 

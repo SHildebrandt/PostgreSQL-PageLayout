@@ -7,25 +7,18 @@ package de.postgresqlinsideout.pagelayout.visualization
  */
 trait LayoutProperties {
 
-  /**
-   * Returns a String containing CSS style definitions with hovers
-   * (-> mouseovers, e.g. to highlight the entry which corresponds to a field in ItemIdData)
-   * @return a String with hover definitions
-   */
-  //def getHovers: String
-  
   val TABLE_SIZE = 8192 // bytes
   val COLUMNS = 64
-  val ROWS = {
-    assert(TABLE_SIZE % COLUMNS == 0, "Please choose a COLUMNS value that makes sense!!")
+  lazy val ROWS = {
+    assert(TABLE_SIZE % COLUMNS == 0, "Please choose a COLUMNS value that makes sense! It should be a divisor of the TABLE_SIZE.")
     TABLE_SIZE / COLUMNS
   }
 
   val TABLE_WIDTH = 16 * 64 // px
   val ROW_HEIGHT = 10 // px
-  val COLUMN_WIDTH = {
+  lazy val COLUMN_WIDTH = {
     assert(TABLE_WIDTH % COLUMNS == 0,
-      "Please choose a TABLE_WIDTH value that fits! (is a multiple of the number of COLUMNS)")
+      s"Please choose a TABLE_WIDTH value that fits! (is a multiple of the number of COLUMNS ($COLUMNS)")
     TABLE_WIDTH / COLUMNS
   }
 
