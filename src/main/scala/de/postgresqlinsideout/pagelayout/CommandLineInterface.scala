@@ -106,17 +106,17 @@ object CommandLineInterface extends App {
     opt[String]('h', "host") action {
       (h, config) =>
         config.copy(host = h)
-    } text ("The database host (e.g. localhost)")
+    } text ("The database host. Default is localhost")
 
     opt[String]('u', "user") action {
       (u, config) =>
         config.copy(user = u)
-    } text ("The user of the database")
+    } text ("The user of the database. Default is postgres")
 
     opt[String]('p', "password") action {
       (p, config) =>
         config.copy(password = p)
-    } text ("The password of the user")
+    } text ("The password of the user. Default is postgres")
 
     opt[Boolean]('c', "compress") action {
       (c, config) =>

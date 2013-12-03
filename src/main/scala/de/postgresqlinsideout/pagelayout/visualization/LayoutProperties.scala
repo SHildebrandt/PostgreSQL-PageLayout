@@ -63,15 +63,12 @@ trait LayoutProperties {
                   |</script>
                   |</head>""".stripMargin
 
-
-  def pageTitle = "Visualization of a Database Page"
-
-  def tableHead = {
+  def tableHead(pageTitle: String) = {
     val body = "<body>\n"
     val title = s"  <h1>$pageTitle</h1>\n"
     val table = "  <table class='center'>\n"
     val cols = (1 to COLUMNS) map (_ => s"    <col class='fixedWidth'/>") mkString "\n"
-    body + /*title + */ table + cols
+    body + title + table + cols
   }
 
   def tableEnd = "  </table>\n</body>"

@@ -17,7 +17,7 @@ class HtmlTable(elements: List[PageElement], table: String, pageNo: Int) extends
   val layout = new LayoutProperties {}
   import layout._
 
-  //def pageTitle = s"Visualization of Page $pageNo in Table $table"
+  def pageTitle = s"Visualization of Page $pageNo in Table $table"
 
   /** elements sorted and optionally ingnored range excluded (if IGNORED_BYTE_RANGE != None)*/
   lazy val contents: SortedSet[PageElement] = {
@@ -123,7 +123,7 @@ class HtmlTable(elements: List[PageElement], table: String, pageNo: Int) extends
 
     writer.println(htmlHead)
     writer.println(header)
-    writer.println(tableHead)
+    writer.println(tableHead(pageTitle))
     contents.foreach(element => {
       content(endPos(element), element)
     })

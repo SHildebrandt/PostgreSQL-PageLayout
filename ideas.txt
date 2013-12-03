@@ -1,5 +1,3 @@
-add query support for command line
-
 check out column_width and row_height: seems like the browser widens it automatically
 
 Optionally:
