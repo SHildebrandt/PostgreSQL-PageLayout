@@ -12,7 +12,10 @@ object CommandLineInterface extends App {
   override def main(args: Array[String]) {
     parser.parse(args, Config()) map {
       c =>
-        val page = new Page(c.database, c.table, c.pageNo)
+        val page = c.condition match {
+          case None => new Page(c.database, c.table, c.pageNo)
+          case Some(cond) => new Query(c.database, c.table, cond, c.pageNo)
+        }
         val visualization = page.getPageVisualization(c.layoutProperties)
         visualization.printToFile(c.outputFile)
     }
@@ -60,6 +63,10 @@ object CommandLineInterface extends App {
     note(
       """Example usage: "-d booktown -t authors -n 0 -f output/testConfig.html"
         |
+        |You can also generate a page for a specific query. In this case you should also give the condition (WHERE ...)
+        |
+        |Example: "-d booktown -t authors -n 0 -f output/testConfig.html -q "WHERE author_id > 2000"
+        |
         |Required options:
       """.stripMargin)
 
@@ -91,6 +98,11 @@ object CommandLineInterface extends App {
 
     note("\nOptional arguments:\n")
 
+    opt[String]('q', "condition") action {
+      (q, config) =>
+        config.copy(condition = Some(q))
+    } text ("Visualizes only the entries for which the condition holds. This should be something like \"WHERE author_id = 42\".")
+
     opt[String]('h', "host") action {
       (h, config) =>
         config.copy(host = h)
@@ -110,7 +122,7 @@ object CommandLineInterface extends App {
       (c, config) =>
         config.copy(compressInnerRows = c)
     } text ("True, if inner rows should be compressed. This is useful to reduce the table size, " +
-      "if some content reaches over several rows.")
+      "if some content reaches over several rows. By default set to true.")
 
     // (Int, Int) would be easier, but this is for key-value-pairs and I cannot change the implicit Read val
     opt[String]('i', "ignore-range") action {
@@ -142,15 +154,17 @@ object CommandLineInterface extends App {
         if (c >= 0) success else failure("Number of columns should be greater than 0")
     }
 
-    opt[Int]('w', "table-width") action {
+    opt[Int]("table-width") action {
       (w, config) =>
         config.copy(tableWidth = Some(w))
-    } text ("The width of the HTML-Table in px")
+    } text ("The width of the HTML-Table in px. " +
+      "Note: For small values, the browser might widen the table (columns) automatically.")
 
     opt[Int]("row-height") action {
       (h, config) =>
         config.copy(rowHeight = Some(h))
-    } text ("The height of a row in the HTML-Table in px")
+    } text ("The height of a row in the HTML-Table in px." +
+      "Note: For small values, the browser might increase the height automatically.")
 
     help("help") text ("Prints this help text")
   }

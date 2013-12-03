@@ -43,6 +43,7 @@ trait LayoutProperties {
   def style = s"""<link rel="stylesheet" type="text/css" href="style.css">
                  |<style type="text/css">
                  |  col.fixedWidth { width:${COLUMN_WIDTH}px; }
+                 |  td { height:${ROW_HEIGHT}px; }
                  |</style>""".stripMargin
 
   def header = s"""<head>
