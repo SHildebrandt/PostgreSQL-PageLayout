@@ -34,9 +34,15 @@ object DBAccess {
     s
   })
 
-  def stringToIntTupel(s: String): (Int, Int) = s.substring(1, s.size - 1).split(",").toList match {
-    case a :: b :: Nil => (a.toInt, b.toInt)
-    case _ => throw new Exception("Could not parse Int-Tuple: " + s)
+  implicit val getCtidsResult = GetResult(r => stringToIntTupel(r.<<[String]))
+
+  def stringToIntTupel(s: String): (Int, Int) = {
+    val start = s.indexOf("(")
+    val end = s.indexOf(")")
+    s.substring(start + 1, end).split(",").toList match {
+      case a :: b :: Nil => (a.toInt, b.toInt)
+      case _ => throw new Exception("Could not parse Int-Tuple: " + s)
+    }
   }
 
   def getPageHeader(db: Database, table: String, pageNo: Int): PageHeaderData = db withSession {
@@ -55,7 +61,24 @@ object DBAccess {
     items
   }
 
-  def getContentForCtid(db: Database, table: String, ctid: (Int, Int)) = db withSession {
+  /**
+   * Returns the ctids of all entries in a table on which the condition holds
+   * The results can be filtered by pages. If filterPages is None, all results are returned.
+   * @param db the database
+   * @param table the table
+   * @param condition the condition (e.g. "WHERE AUTHOR_ID = 1212")
+   * @param filterPages filters the resulting ctids by the pages indicated, if it is None all ctids are returned
+   * @return a list of the ctids that satisfy the condition
+   */
+  def getCtidsForCondition(db: Database, table: String, condition: String, filterPages: Option[Set[Int]] = None): List[(Int, Int)] = db withSession {
+    val result = StaticQuery.queryNA[(Int, Int)](s"SELECT ctid FROM $table $condition").list
+    filterPages match {
+      case None => result
+      case Some(xs) => result filter (xs contains _._1)
+    }
+  }
+
+  def getContentForCtid(db: Database, table: String, ctid: (Int, Int)): List[String] = db withSession {
     StaticQuery.queryNA[List[String]](s"SELECT * FROM $table WHERE ctid = '$ctid'").list.head
   }
 

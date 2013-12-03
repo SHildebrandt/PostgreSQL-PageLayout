@@ -12,7 +12,7 @@ import scala.collection.mutable.ListBuffer
 /**
  * A PostgreSQL page and its contents.
  * (cf. http://www.postgresql.org/docs/9.3/static/storage-page-layout.html)
- * Free space and special space are currently ignored.
+ * Special space is currently ignored.
  *
  * @author Steffen Hildebrandt
  */
@@ -20,7 +20,7 @@ class Page(db: Database, table: String, pageNo: Int) {
   import Page._
 
   private lazy val pageHeaderData = DBAccess.getPageHeader(db, table, pageNo)
-  private lazy val heapPageItems = DBAccess.getHeapPageItems(db, table, pageNo)
+  protected lazy val heapPageItems = DBAccess.getHeapPageItems(db, table, pageNo)
 
   def getPageVisualization: PageVisualization = new HtmlTable(pageElements, table, pageNo)
 

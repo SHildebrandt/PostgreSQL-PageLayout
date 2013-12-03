@@ -1,7 +1,7 @@
 package de.postgresqlinsideout.pagelayout
 
 import java.io.File
-import de.postgresqlinsideout.pagelayout.data.{Page, DBAccess}
+import de.postgresqlinsideout.pagelayout.data.{Query, Page, DBAccess}
 import de.postgresqlinsideout.pagelayout.visualization.PageElement
 import de.postgresqlinsideout.pagelayout.visualization.HtmlTable
 import scala.slick.session.Database
@@ -21,6 +21,9 @@ object Main extends App {
 
     page.getPageVisualization.printToFile(new File("output/PageLayout.html"))
 
+    val query = new Query(db, "books", "WHERE author_id > 5000", 0)
+
+    query.getPageVisualization.printToFile(new File("output/QueryLayout.html"))
   }
 
 }
