@@ -18,7 +18,7 @@ object DBAccess {
     PageHeaderData(r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<))
 
   implicit val getHeapPageItemResult = GetResult(r =>
-    HeapPageItem(r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, stringToIntTupel(r.<<[String]), r.<<, r.<<, r.<<, r.<<, r.<<))
+    HeapPageItemData(r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, stringToIntTupel(r.<<[String]), r.<<, r.<<, r.<<, r.<<, r.<<))
 
   implicit val getStringListResult = GetResult(r => {
     val result = ListBuffer[String]()
@@ -46,8 +46,8 @@ object DBAccess {
     result(0)
   }
 
-  def getHeapPageItems(db: Database, table: String, pageNo: Int): List[HeapPageItem] = db withSession {
-    val items = StaticQuery.queryNA[HeapPageItem](s"SELECT * FROM heap_page_items(get_raw_page('$table', $pageNo))").list
+  def getHeapPageItems(db: Database, table: String, pageNo: Int): List[HeapPageItemData] = db withSession {
+    val items = StaticQuery.queryNA[HeapPageItemData](s"SELECT * FROM heap_page_items(get_raw_page('$table', $pageNo))").list
     items foreach { i =>
       i.fromDB = Some(db)
       i.fromTable = Some(table)

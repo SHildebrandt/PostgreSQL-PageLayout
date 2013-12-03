@@ -14,10 +14,10 @@ object Main extends App {
 
   override def main(args: Array[String]) {
 
-    val db = Database.forURL("jdbc:postgresql://localhost/dell", user = "postgres", password = "postgres")
-    //val db = Database.forURL("jdbc:postgresql://localhost/booktown", user = "postgres", password = "postgres")
+    //val db = Database.forURL("jdbc:postgresql://localhost/dell", user = "postgres", password = "postgres")
+    val db = Database.forURL("jdbc:postgresql://localhost/booktown", user = "postgres", password = "postgres")
 
-    val page = new Page(db, "customers", 0)  // other tables for dell: orders, orderlines, cust_hist, products
+    val page = new Page(db, "books", 0)  // other tables for dell: orders, orderlines, cust_hist, products
 
     page.getPageVisualization.printToFile(new File("output/PageLayout.html"))
 

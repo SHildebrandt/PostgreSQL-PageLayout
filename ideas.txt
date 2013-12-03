@@ -1,0 +1,10 @@
+command line with scopt: https://github.com/scopt/scopt
+
+fix ids... maybe it still works with classes or so (like as a flag or so?!)...
+Problem: If item header goes over more than one line, only the first part is emphasized
+
+Optionally:
+
+Separate items into single columns
+
+add support for queries instead of whole tables

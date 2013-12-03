@@ -25,7 +25,7 @@ import scala.slick.session.Database
  *
  * @author Steffen Hildebrandt
  */
-class HeapPageItem(val lp: Field[Int], val lpOff: Field[Int], val lpFlags: Field[Int], val lpLen: Field[Int],
+class HeapPageItemData(val lp: Field[Int], val lpOff: Field[Int], val lpFlags: Field[Int], val lpLen: Field[Int],
                    val tXmin: Field[Int], val tXmax: Field[Int], val tField3: Field[Int], val tCtid: Field[(Int, Int)],
                    val tInfomask2: Field[Int], val tInfomask: Field[Int], val tHoff: Field[Int], val tBits: Field[String],
                    val tOid: Field[Int])
@@ -51,11 +51,11 @@ class HeapPageItem(val lp: Field[Int], val lpOff: Field[Int], val lpFlags: Field
   val lastByte = firstByte + lpLen.value - 1
 }
 
-object HeapPageItem {
+object HeapPageItemData {
 
   def apply(lp: Int, lpOff: Int, lpFlags: Int, lpLen: Int, tXmin: Int, tXmax: Int, tField3: Int, tCtid: (Int, Int),
             tInfomask2: Int, tInfomask: Int, tHoff: Int, tBits: String, tOid: Int) =
-    new HeapPageItem(
+    new HeapPageItemData(
       new Field("lp", lp, 0),
       new Field("lpOff", lpOff, 2), // 15 bit
       new Field("lpFlags", lpFlags, 0), //  2 bit

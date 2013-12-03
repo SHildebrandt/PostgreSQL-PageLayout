@@ -1,0 +1,40 @@
+## all new scopt 3.0
+
+scopt 3.0 was rewritten from scratch to clean up the API:
+
+    val parser = new scopt.OptionParser[Config]("scopt") {
+      head("scopt", "3.x")
+      opt[Int]('f', "foo") action { (x, c) =>
+        c.copy(foo = x) } text("foo is an integer property")
+      arg[File]("<file>...") unbounded() optional() action { (x, c) =>
+        c.copy(files = c.files :+ x) } text("optional unbounded args")
+    }
+
+### polymorphic opt/arg
+
+Both `opt[A]` and `arg[A]` take a type parameter of `A: Read`. Out of the box, `Unit`, `Int`, `Long`, `Double`, `String`, `Boolean`, `BigInt`, `BigDecimal`, `java.io.File`, `java.net.URI`, `java.util.Calendar` are supported. Key=value parameters are expressed as pair `(A1, A2)`.
+
+### occurrences and custom validation
+
+Occurrences can be specified using the fluent interface:
+
+    opt[File]('o', "out") required()
+    arg[File]("<file>...") optional() unbounded()
+
+Custom validation logic:
+
+    opt[Int]('f', "foo") validate { x =>
+      if (x > 0) success else failure("Option --foo must be >0") } 
+
+### commands
+
+scopt3 supports multiple levels of command structure:
+
+    cmd("backend") text("commands to manipulate backends:\n") action { (x, c) =>
+      c.copy(flag = true) } children {
+      cmd("update") children {
+        arg[String]("<a>") action { (x, c) => c.copy(a = x) } 
+      }     
+    }
+
+See [scopt](https://github.com/scopt/scopt) for more details.

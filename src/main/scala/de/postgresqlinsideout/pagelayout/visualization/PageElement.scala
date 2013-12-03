@@ -1,6 +1,6 @@
 package de.postgresqlinsideout.pagelayout.visualization
 
-import de.postgresqlinsideout.pagelayout.data.{DBAccess, PageHeaderData, HeapPageItem}
+import de.postgresqlinsideout.pagelayout.data.{DBAccess, PageHeaderData, HeapPageItemData}
 
 /**
  * An element within a page.
@@ -48,11 +48,11 @@ case class ItemHeader(firstByte: Int, lastByte: Int, item: Item) extends PageEle
   val tdClass = "itemheader"
 }
 
-case class Item(firstByte: Int, lastByte: Int, heapPageItem: HeapPageItem) extends PageElement {
+case class Item(firstByte: Int, lastByte: Int, heapPageItem: HeapPageItemData) extends PageElement {
   val db = heapPageItem.fromDB
   val table = heapPageItem.fromTable
   lazy val content = (db, table) match {
-    case (Some(d), Some(t)) => s"$t(${DBAccess.getContentForCtid(d, t, heapPageItem.tCtid.value) mkString ","})"
+    case (Some(d), Some(t)) => s"${DBAccess.getContentForCtid(d, t, heapPageItem.tCtid.value) mkString ","}"
     case _ => s"Item with ctid = ${heapPageItem.tCtid.value}"
   }
   val contentContinued = "..."

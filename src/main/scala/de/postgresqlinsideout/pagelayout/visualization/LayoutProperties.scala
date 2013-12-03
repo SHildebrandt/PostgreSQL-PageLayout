@@ -31,7 +31,6 @@ trait LayoutProperties {
 
   val EMPHASIZE_FUNCTION_NAME = "emphasize"
   val UNEMPHASIZE_FUNCTION_NAME = "unemphasize"
-  val EMPHASIZE_STYLE = "backgroundColor = \"blue\""
 
   /**
     * Should the inner rows be compressed, if a PageElement reaches over more than 2 rows?
@@ -58,10 +57,11 @@ trait LayoutProperties {
                   |$style
                   |<script language="javascript" type="text/javascript">
                   |function $EMPHASIZE_FUNCTION_NAME(id) {
-                  |   document.getElementById(id).style.$EMPHASIZE_STYLE;
+                  |   document.getElementById(id).className += " emphasize";
                   |}
                   |function $UNEMPHASIZE_FUNCTION_NAME(id) {
-                  |   document.getElementById(id).style.backgroundColor = \"\";
+                  |   var c = document.getElementById(id).className;
+                  |   document.getElementById(id).className = c.substring(0, c.length - 10);
                   |}
                   |</script>
                   |</head>""".stripMargin

@@ -1,0 +1,9 @@
+- Fixes the signature of `opt(String, String, String)`. [#2][2]
+- Fixes `help` and `flag` methods. [#3][3]/[#4][4];[#6][6] contributed by [@kxbmap][@kxbmap]
+- Cross publishes to Scala 2.8.1, 2.8.2, 2.9.0-1, 2.9.1, and 2.9.2 as a good citizen.
+
+  [2]: https://github.com/scopt/scopt/issues/2
+  [3]: https://github.com/scopt/scopt/issues/3
+  [4]: https://github.com/scopt/scopt/issues/4
+  [6]: https://github.com/scopt/scopt/pull/6
+  [@kxbmap]: https://github.com/kxbmap

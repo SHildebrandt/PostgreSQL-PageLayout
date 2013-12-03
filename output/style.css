@@ -1,3 +1,8 @@
+body {
+  font-family: "Helvetica", "Arial", sans-serif;
+  font-size: 12pt;
+}
+
 table.center {
   border:3px solid black;
   table-layout:fixed;
@@ -7,10 +12,12 @@ table.center {
 
 td {
   border:1px solid black;
+  padding-top: 2px;
+  padding-bottom: 1px;
   height:20px;
   text-align:center;
+  vertical-align: middle;
   overflow:hidden;
-  word-wrap:break-word;
 }
 
 td.empty {
@@ -19,6 +26,7 @@ td.empty {
 
 td.item {
   background-color:red;
+  color: whitesmoke;
 }
 
 td.pageheader {
@@ -31,11 +39,18 @@ td.itemheader {
 
 td.itemiddata {
   background-color:green;
+  color: gold;
 }
 
 td.leftOutRows {
   height:1px;
   border:2px solid black;
+}
+
+td.emphasize {
+  background-color: blue !important;
+  color: gold !important;
+  font-weight: bold !important;
 }
 
 td.ignored {
