@@ -8,6 +8,7 @@ import de.postgresqlinsideout.pagelayout.visualization.Item
 import scala.slick.session.Database
 import scala.collection.SortedSet
 import scala.collection.mutable.ListBuffer
+import scala.util.{Failure, Success, Try}
 
 /**
  * A PostgreSQL page and its contents.
@@ -93,4 +94,14 @@ object Page {
   val ITEM_ID_DATA_START = 24 // byte number on page
 
   val DATA_HEADER_SIZE = 23 // bytes
+
+  def getVisualisationsOfAllPages(db: Database, table: String, layout: LayoutProperties): List[PageVisualization] = {
+    def visOfPage(pageNo: Int): Try[PageVisualization] = {
+      val q = new Page(db, table, pageNo)
+      Try(q.getPageVisualization(layout))
+    }
+    val visStream = Stream from 0 map (n => visOfPage(n))
+    val visualizations = (visStream takeWhile (_.isSuccess)).toList
+    visualizations map {case Success(v) => v}
+  }
 }

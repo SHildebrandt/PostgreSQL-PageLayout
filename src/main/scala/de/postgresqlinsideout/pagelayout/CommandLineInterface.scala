@@ -1,6 +1,6 @@
 package de.postgresqlinsideout.pagelayout
 
-import scopt.{Read, OptionParser}
+import scopt.OptionParser
 import scala.slick.session.Database
 import de.postgresqlinsideout.pagelayout.visualization.LayoutProperties
 import de.postgresqlinsideout.pagelayout.data.{Query, Page}
@@ -9,20 +9,38 @@ import java.io.File
 
 object CommandLineInterface extends App {
 
+  lazy val PAGE_FILE_EXTENSION = "_page_"
+
   override def main(args: Array[String]) {
-    parser.parse(args, Config()) map {
-      c =>
-        val page = c.condition match {
-          case None => new Page(c.database, c.table, c.pageNo)
-          case Some(cond) => new Query(c.database, c.table, cond, c.pageNo)
+    val config = parser parse (args, Config())
+    config match {
+      case Some(c) =>
+        c.pageNo match {
+          case Right(n) =>
+            val page = c.condition match {
+              case None => new Page(c.database, c.table, n)
+              case Some(cond) => new Query(c.database, c.table, cond, n)
+            }
+            val visualization = page.getPageVisualization(c.layoutProperties)
+            visualization.printToFile(new File(c.outputFile))
+          case Left(_) =>
+            val visualizations = c.condition match {
+              case None => Page.getVisualisationsOfAllPages(c.database, c.table, c.layoutProperties)
+              case Some(cond) => Query.getVisualisationsOfAllPages(c.database, c.table, cond, c.layoutProperties)
+            }
+            visualizations.zipWithIndex foreach {case (v, i) =>
+              val f = c.outputFile
+              val fileName = if (f.endsWith(".html")) f.substring(0, f.size - 5) else f
+              v.printToFile(new File(fileName + PAGE_FILE_EXTENSION + i + ".html"))
+            }
         }
-        val visualization = page.getPageVisualization(c.layoutProperties)
-        visualization.printToFile(c.outputFile)
+
+      case None => ()
     }
   }
 
   case class Config(db: String = null, host: String = "localhost", user: String = "postgres", password: String = "postgres",
-                    table: String = null, pageNo: Int = -1, condition: Option[String] = None, outputFile: File = null,
+                    table: String = null, pageNo: Either[Unit, Int] = Right(-1), condition: Option[String] = None, outputFile: String = null,
                     compressInnerRows: Boolean = true, ignoredByteRange: Option[(Int, Int)] = None,
                     tableSize: Option[Int] = None, columns: Option[Int] = None,
                     tableWidth: Option[Int] = None, rowHeight: Option[Int] = None) {
@@ -82,19 +100,21 @@ object CommandLineInterface extends App {
 
     opt[Int]('n', "page-no") action {
       (n, config) =>
-        config.copy(pageNo = n)
-    } text ("The number of the page to be visualized") required() validate {
+        config.copy(pageNo = Right(n))
+    } text ("The number of the page to be visualized") validate {
       n =>
         if (n >= 0) success else failure("Page number must be greater than 0")
     }
 
+    opt[Unit]('a', "all-pages") action {
+      (_, config) =>
+        config.copy(pageNo = Left())
+    } text {"Create visualizations of all pages instead of a single one"}
+
     opt[String]('f', "file") action {
       (f, config) =>
-        config.copy(outputFile = new File(f))
-    } text ("The output file to which the visualization is printed") required() valueName ("<file>") validate {
-      f =>
-        if (true) success else failure(s"The given file is not valid: $f")
-    }
+        config.copy(outputFile = f)
+    } text ("The output file to which the visualization is printed") required() valueName ("<file>")
 
     note("\nOptional arguments:\n")
 
@@ -167,6 +187,13 @@ object CommandLineInterface extends App {
       "Note: For small values, the browser might increase the height automatically.")
 
     help("help") text ("Prints this help text")
+
+    checkConfig {
+      _.pageNo match {
+        case Left(_) => success
+        case Right(i) => if (i >= 0) success else failure("One of the options page-no or all-pages is required!")
+      }
+    }
   }
 
 
