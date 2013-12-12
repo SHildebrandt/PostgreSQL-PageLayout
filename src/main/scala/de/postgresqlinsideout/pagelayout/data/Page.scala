@@ -20,8 +20,8 @@ import scala.util.{Failure, Success, Try}
 class Page(db: Database, table: String, pageNo: Int) {
   import Page._
 
-  private lazy val pageHeaderData = DBAccess.getPageHeader(db, table, pageNo)
-  protected lazy val heapPageItems = DBAccess.getHeapPageItems(db, table, pageNo)
+  private lazy val pageHeaderData = DBAccess.getPageHeaderData(db, table, pageNo)
+  protected lazy val heapPageItems = DBAccess.getHeapPageItemsData(db, table, pageNo)
 
   def getPageVisualization(withLayout: LayoutProperties = new LayoutProperties {}): PageVisualization =
     new HtmlTable(pageElements, table, pageNo) {

@@ -10,7 +10,7 @@ import scala.collection.immutable.IndexedSeq
  *
  * @author Steffen Hildebrandt
  */
-class HtmlTable(elements: List[PageElement], table: String, pageNo: Int) extends PageVisualization {
+class HtmlTable(elements: List[PageElement], table: String, pageNo: Int, query: Option[String] = None) extends PageVisualization {
 
   import HtmlTable._
 
@@ -18,6 +18,7 @@ class HtmlTable(elements: List[PageElement], table: String, pageNo: Int) extends
   import layout._
 
   def pageTitle = s"Visualization of Page $pageNo in Table $table"
+  def pageSubtitle: Option[String] = query map ("under the condition '" + _ + "'")
 
   /** elements sorted and optionally ingnored range excluded (if IGNORED_BYTE_RANGE != None)*/
   lazy val contents: SortedSet[PageElement] = {
@@ -39,6 +40,15 @@ class HtmlTable(elements: List[PageElement], table: String, pageNo: Int) extends
 
   private def endPos(item: PageElement) = (item.lastByte / COLUMNS + 1, item.lastByte % COLUMNS + 1)
 
+  /**
+   * Prints the contents of this HtmlTable to the given file.
+   * The result will be an html file with the contents placed into a table,
+   * many of the properties can be adjusted in the field layout.
+   *
+   * The folder containing this file should contain a .css file defining the respective td classes,
+   * this allows the user to easily change the look of the html file.
+   * @param file The file which the html content should be printed to.
+   */
   override def printToFile(file: File) = {
     val writer = new PrintWriter(file)
     var currentRow = 1
@@ -123,7 +133,7 @@ class HtmlTable(elements: List[PageElement], table: String, pageNo: Int) extends
 
     writer.println(htmlHead)
     writer.println(header)
-    writer.println(tableHead(pageTitle))
+    writer.println(tableHead(pageTitle, pageSubtitle))
     contents.foreach(element => {
       content(endPos(element), element)
     })

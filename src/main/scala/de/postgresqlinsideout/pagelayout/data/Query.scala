@@ -2,7 +2,7 @@ package de.postgresqlinsideout.pagelayout.data
 
 import scala.Some
 import scala.slick.session.Database
-import de.postgresqlinsideout.pagelayout.visualization.{PageVisualization, LayoutProperties}
+import de.postgresqlinsideout.pagelayout.visualization.{HtmlTable, PageVisualization, LayoutProperties}
 import scala.util.{Success, Failure, Try}
 
 /**
@@ -14,8 +14,12 @@ class Query(db: Database, table: String, condition: String, pageNo: Int)
   extends Page(db, table, pageNo) {
 
   private val ctids = DBAccess.getCtidsForCondition(db, table, condition, Some(Set(pageNo)))
-  override protected lazy val heapPageItems = DBAccess.getHeapPageItems(db, table, pageNo) filter (ctids contains _.tCtid.value)
+  override protected lazy val heapPageItems = DBAccess.getHeapPageItemsData(db, table, pageNo) filter (ctids contains _.tCtid.value)
 
+  override def getPageVisualization(withLayout: LayoutProperties = new LayoutProperties {}): PageVisualization =
+    new HtmlTable(pageElements, table, pageNo, Some(condition)) {
+      override val layout = withLayout
+    }
 }
 
 object Query {

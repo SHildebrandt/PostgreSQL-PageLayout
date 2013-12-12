@@ -6,6 +6,9 @@ import Database.threadLocalSession
 import scala.collection.mutable.ListBuffer
 
 /**
+ * This object provides all the necessary utilities for the database access
+ * This includes fetching the PageHeaderData of pages, the HeapTupleItemData
+ * or the content of a page as well as the corresponding ctids
  *
  * @author Steffen Hildebrandt
  */
@@ -14,10 +17,11 @@ object DBAccess {
   // initialize PostgreSQL driver
   Class.forName("org.postgresql.Driver")
 
-  implicit val getPageHeaderResult = GetResult(r =>
+  // Implicits that tell slick how to interpret/transform rows to objects (PageHeaderData etc.)
+  implicit val getPageHeaderDataResult = GetResult(r =>
     PageHeaderData(r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<))
 
-  implicit val getHeapPageItemResult = GetResult(r =>
+  implicit val getHeapPageItemDataResult = GetResult(r =>
     HeapPageItemData(r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, stringToIntTupel(r.<<[String]), r.<<, r.<<, r.<<, r.<<, r.<<))
 
   implicit val getStringListResult = GetResult(r => {
@@ -45,14 +49,28 @@ object DBAccess {
     }
   }
 
-  def getPageHeader(db: Database, table: String, pageNo: Int): PageHeaderData = db withSession {
+  /**
+   * Takes a Database, a table and a page number and returns the PageHeaderData of that table's page in the database
+   * @param db the database
+   * @param table the table
+   * @param pageNo the page number
+   * @return The PageHeaderData
+   */
+  def getPageHeaderData(db: Database, table: String, pageNo: Int): PageHeaderData = db withSession {
     val result = StaticQuery.queryNA[PageHeaderData](s"SELECT * FROM page_header(get_raw_page('$table', $pageNo))").list
     if (result.size != 1)
       throw new Exception("Unexpected result size of function page_header")
     result(0)
   }
 
-  def getHeapPageItems(db: Database, table: String, pageNo: Int): List[HeapPageItemData] = db withSession {
+  /**
+   * Takes a Database, a table and a page number and returns a list of all the HeapPageItems of that table's page in the database
+   * @param db the database
+   * @param table the table
+   * @param pageNo the page number
+   * @return A list of all the HeapPageItems
+   */
+  def getHeapPageItemsData(db: Database, table: String, pageNo: Int): List[HeapPageItemData] = db withSession {
     val items = StaticQuery.queryNA[HeapPageItemData](s"SELECT * FROM heap_page_items(get_raw_page('$table', $pageNo))").list
     items foreach { i =>
       i.fromDB = Some(db)
@@ -83,7 +101,6 @@ object DBAccess {
   }
 
   def getPageHeaderString(db: Database, table: String, pageNo: Int): List[String] = db withSession {
-    //StaticQuery.queryNA[String](s"SELECT * FROM pg_tables").list()
     val q = StaticQuery.queryNA[String](s"SELECT * FROM page_header(get_raw_page('$table', $pageNo))")
     println(q.getStatement)
     q.list()
