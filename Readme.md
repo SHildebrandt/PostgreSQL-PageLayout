@@ -1,11 +1,17 @@
 PostgreSQL-PageLayout
 =====================
 
-This tool provides utilities to create visualizations of Pages in PostgreSQL.
+This tool provides utilities to create visualizations of Pages in PostgreSQL. The project is still under development, but I think the current status is already worth to be published here.
 
-### Usage:
 
-You can run this tool easily with SBT.
+### Example output
+
+You can find some (more or less) up-to-date examples in the output directory.
+
+
+### Usage
+
+You can run this tool easily with SBT. Just clone or download this repository to your system and run SBT in the top folder.
 
 Example usage:
 ```
