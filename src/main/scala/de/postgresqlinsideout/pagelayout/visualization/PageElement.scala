@@ -52,7 +52,7 @@ case class Item(firstByte: Int, lastByte: Int, heapPageItem: HeapPageItemData) e
   val db = heapPageItem.fromDB
   val table = heapPageItem.fromTable
   lazy val content = (db, table) match {
-    case (Some(d), Some(t)) => s"${DBAccess.getContentForCtid(d, t, heapPageItem.tCtid.value) mkString ","}"
+    case (Some(d), Some(t)) => s"${DBAccess.getContentForCtid(d, t, heapPageItem.tCtid.value) mkString " , "}"
     case _ => s"Item with ctid = ${heapPageItem.tCtid.value}"
   }
   val contentContinued = "..."

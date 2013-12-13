@@ -2,7 +2,7 @@ package de.postgresqlinsideout.pagelayout
 
 import scopt.OptionParser
 import scala.slick.session.Database
-import de.postgresqlinsideout.pagelayout.visualization.LayoutProperties
+import de.postgresqlinsideout.pagelayout.visualization.{HtmlTable, LayoutProperties}
 import de.postgresqlinsideout.pagelayout.data.{Query, Page}
 import java.io.File
 
@@ -14,18 +14,27 @@ object CommandLineInterface extends App {
   override def main(args: Array[String]) {
     val config = parser parse (args, Config())
     config match {
+      // parsing failed
+      case None => ()
+      // parsing successful
       case Some(c) =>
         c.pageNo match {
+          // print page number n
           case Right(n) =>
             val page = c.condition match {
+              // visualize whole page
               case None => new Page(c.database, c.table, n)
+              // visualize query
               case Some(cond) => new Query(c.database, c.table, cond, n)
             }
-            val visualization = page.getPageVisualization(c.layoutProperties)
+            val visualization = new HtmlTable(page, c.layoutProperties)
             visualization.printToFile(new File(c.outputFile))
+          // print all pages
           case Left(_) =>
             val visualizations = c.condition match {
+              // visualize whole page
               case None => Page.getVisualisationsOfAllPages(c.database, c.table, c.layoutProperties)
+              // visualize query
               case Some(cond) => Query.getVisualisationsOfAllPages(c.database, c.table, cond, c.layoutProperties)
             }
             visualizations.zipWithIndex foreach {case (v, i) =>
@@ -34,8 +43,6 @@ object CommandLineInterface extends App {
               v.printToFile(new File(fileName + PAGE_FILE_EXTENSION + i + ".html"))
             }
         }
-
-      case None => ()
     }
   }
 
@@ -194,21 +201,6 @@ object CommandLineInterface extends App {
         case Right(i) => if (i >= 0) success else failure("One of the options page-no or all-pages is required!")
       }
     }
-  }
-
-
-  def test(args: Array[String]) {
-
-    //val db = Database.forURL("jdbc:postgresql://localhost/dell", user = "postgres", password = "postgres")
-    val db = Database.forURL("jdbc:postgresql://localhost/booktown", user = "postgres", password = "postgres")
-
-    val page = new Page(db, "books", 0)  // other tables for dell: orders, orderlines, cust_hist, products
-
-    page.getPageVisualization().printToFile(new File("output/PageLayout.html"))
-
-    val query = new Query(db, "books", "WHERE author_id > 5000", 0)
-
-    query.getPageVisualization().printToFile(new File("output/QueryLayout.html"))
   }
 
 }

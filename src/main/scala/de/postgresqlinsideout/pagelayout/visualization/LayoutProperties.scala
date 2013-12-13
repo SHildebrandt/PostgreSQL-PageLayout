@@ -63,13 +63,14 @@ trait LayoutProperties {
                   |</script>
                   |</head>""".stripMargin
 
-  def tableHead(pageTitle: String, pageSubTitle: Option[String]) = {
+  def tableHead(pageTitle: String, pageSubTitle: Option[String], columnNames: List[String]) = {
     val body = "<body>\n"
     val title = s"  <h1>$pageTitle</h1>\n"
-    val subtitle = if (!pageSubTitle.isDefined) "" else s"  <h3>${pageSubTitle.get}</h3>\n"
+    val subtitle = if (!pageSubTitle.isDefined) "" else s"  <h2>${pageSubTitle.get}</h2>\n"
+    val columnDescription = s"  <h3>Column Names: ${columnNames.mkString(", ")}</h3>\n"
     val table = "  <table class='center'>\n"
     val cols = (1 to COLUMNS) map (_ => s"    <col class='fixedWidth'/>") mkString "\n"
-    body + title + subtitle + table + cols
+    body + title + subtitle + columnDescription + table + cols
   }
 
   def tableEnd = "  </table>\n</body>"

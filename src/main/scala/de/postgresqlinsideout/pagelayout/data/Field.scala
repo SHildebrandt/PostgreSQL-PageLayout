@@ -15,5 +15,5 @@ abstract class FieldList {
 
   def toList(): List[Field[_]]
 
-  def itemString = "(" + (this.toList map (f => s"${f.name}=${f.value}") mkString ",") + ")"
+  def itemString = "(" + (this.toList map (f => s"${f.name}=${f.value}") mkString " , ") + ")"
 }

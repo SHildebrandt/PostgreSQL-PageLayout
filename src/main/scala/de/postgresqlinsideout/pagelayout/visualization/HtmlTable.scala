@@ -3,6 +3,7 @@ package de.postgresqlinsideout.pagelayout.visualization
 import scala.collection.SortedSet
 import java.io.{PrintWriter, File}
 import scala.collection.immutable.IndexedSeq
+import de.postgresqlinsideout.pagelayout.data.Page
 
 
 /**
@@ -10,11 +11,8 @@ import scala.collection.immutable.IndexedSeq
  *
  * @author Steffen Hildebrandt
  */
-class HtmlTable(elements: List[PageElement], table: String, pageNo: Int, query: Option[String] = None) extends PageVisualization {
-
+class HtmlTable(page: Page, layout: LayoutProperties) extends PageVisualization(page) {
   import HtmlTable._
-
-  val layout = new LayoutProperties {}
   import layout._
 
   def pageTitle = s"Visualization of Page $pageNo in Table $table"
@@ -133,7 +131,7 @@ class HtmlTable(elements: List[PageElement], table: String, pageNo: Int, query: 
 
     writer.println(htmlHead)
     writer.println(header)
-    writer.println(tableHead(pageTitle, pageSubtitle))
+    writer.println(tableHead(pageTitle, pageSubtitle, page.columnNames))
     contents.foreach(element => {
       content(endPos(element), element)
     })

@@ -17,16 +17,13 @@ import scala.util.{Failure, Success, Try}
  *
  * @author Steffen Hildebrandt
  */
-class Page(db: Database, table: String, pageNo: Int) {
+class Page(val db: Database, val table: String, val pageNo: Int) {
   import Page._
 
   private lazy val pageHeaderData = DBAccess.getPageHeaderData(db, table, pageNo)
   protected lazy val heapPageItems = DBAccess.getHeapPageItemsData(db, table, pageNo)
 
-  def getPageVisualization(withLayout: LayoutProperties = new LayoutProperties {}): PageVisualization =
-    new HtmlTable(pageElements, table, pageNo) {
-      override val layout = withLayout
-    }
+  lazy val columnNames = DBAccess.getColumnNames(db, table)
 
   /**
    * Returns all elements in this page as a List of PageElement
@@ -97,8 +94,8 @@ object Page {
 
   def getVisualisationsOfAllPages(db: Database, table: String, layout: LayoutProperties): List[PageVisualization] = {
     def visOfPage(pageNo: Int): Try[PageVisualization] = {
-      val q = new Page(db, table, pageNo)
-      Try(q.getPageVisualization(layout))
+      val p = new Page(db, table, pageNo)
+      Try(new HtmlTable(p, layout))
     }
     val visStream = Stream from 0 map (n => visOfPage(n))
     val visualizations = (visStream takeWhile (_.isSuccess)).toList

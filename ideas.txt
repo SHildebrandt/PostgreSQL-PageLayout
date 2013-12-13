@@ -3,5 +3,3 @@ check out column_width and row_height: seems like the browser widens it automati
 Optionally:
 
 Separate items into single columns
-
-extend Query to support several pages (maybe just return a list of PageVisualisation)

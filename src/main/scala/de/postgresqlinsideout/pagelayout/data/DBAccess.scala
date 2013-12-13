@@ -109,4 +109,9 @@ object DBAccess {
   def getContent(db: Database, table: String): List[List[String]] = db withSession {
     StaticQuery.queryNA[List[String]](s"SELECT * FROM '$table'").list
   }
+
+  def getColumnNames(db: Database, table: String): List[String] = db withSession {
+    val query = s"SELECT column_name FROM information_schema.columns WHERE table_name = '$table'"
+    StaticQuery.queryNA[List[String]](query).list.flatten
+  }
 }

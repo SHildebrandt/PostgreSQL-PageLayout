@@ -10,24 +10,22 @@ import scala.util.{Success, Failure, Try}
  *
  * @author Steffen Hildebrandt
  */
-class Query(db: Database, table: String, condition: String, pageNo: Int)
+class Query(override val db: Database, override val table: String, val condition: String, override val pageNo: Int)
   extends Page(db, table, pageNo) {
 
   private val ctids = DBAccess.getCtidsForCondition(db, table, condition, Some(Set(pageNo)))
   override protected lazy val heapPageItems = DBAccess.getHeapPageItemsData(db, table, pageNo) filter (ctids contains _.tCtid.value)
 
-  override def getPageVisualization(withLayout: LayoutProperties = new LayoutProperties {}): PageVisualization =
-    new HtmlTable(pageElements, table, pageNo, Some(condition)) {
-      override val layout = withLayout
-    }
 }
 
 object Query {
 
+  def unapply(q: Query) = Some((q.db, q.table, q.condition, q.pageNo))
+
   def getVisualisationsOfAllPages(db: Database, table: String, condition: String, layout: LayoutProperties): List[PageVisualization] = {
     def visOfPage(pageNo: Int): Try[PageVisualization] = {
       val q = new Query(db, table, condition, pageNo)
-      Try(q.getPageVisualization(layout))
+      Try(new HtmlTable(q, layout))
     }
     val visStream = Stream from 0 map (n => visOfPage(n))
     val visualizations = (visStream takeWhile (_.isSuccess)).toList
