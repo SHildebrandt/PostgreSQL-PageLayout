@@ -1,7 +1,7 @@
 PostgreSQL-PageLayout
 =====================
 
-This tool provides utilities to create visualizations of Pages in PostgreSQL. The project is still under development, but I think the current status is already worth to be published here.
+This tool provides utilities to create html visualizations of Pages in PostgreSQL. The project is still under development, but I think the current status is already worth to be published here. It was started during the seminar "PostgreSQL Inside/Out" at the University of Tuebingen in Germany.
 
 
 ### Example output
