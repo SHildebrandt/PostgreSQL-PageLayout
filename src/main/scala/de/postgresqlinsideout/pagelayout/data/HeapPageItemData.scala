@@ -44,9 +44,9 @@ import scala.slick.session.Database
  * @param tCtid current TID of this or newer tuple
  * @param tInfomask2 number of attributes + various flags
  * @param tInfomask various flag bits
- * @param tHoff offset to user data
- * @param tBits
- * @param tOid
+ * @param tHoff sizeof header incl. bitmap, oid, padding
+ * @param tBits bitmap of NULLs -- variable length
+ * @param tOid object id
  *
  * @author Steffen Hildebrandt
  */
@@ -70,10 +70,16 @@ class HeapPageItemData(val lp: Field[Int], val lpOff: Field[Int], val lpFlags: F
 
   override def toString() = "HeapPageItem" + itemString
 
+  val headerSize = tHoff.value
+
+  val firstByte = lpOff.value // first Byte of this item (== first Byte of ItemHeader)
+  val lastByte = firstByte + lpLen.value - 1 // last Byte of this item
   val itemIdDataStart = Page.ITEM_ID_DATA_START + (lp.value - 1) * 4
   val itemIdDataEnd = itemIdDataStart + 3
-  val firstByte = lpOff.value
-  val lastByte = firstByte + lpLen.value - 1
+  val itemHeaderStart = lpOff.value
+  val itemHeaderEnd = firstByte + headerSize - 1
+  val itemDataStart = firstByte + headerSize
+  val itemDataEnd = lastByte
 }
 
 object HeapPageItemData {
@@ -92,7 +98,7 @@ object HeapPageItemData {
       new Field("tInfomask2", tInfomask2, 2),
       new Field("tInfomask", tInfomask, 2),
       new Field("tHoff", tHoff, 1),
-      new Field("tBits", tBits, -1), // undefined length(?!!)
-      new Field("tOid", tOid, 0)) // size ????
+      new Field("tBits", tBits, -1), // undefined length (depending on number of fields, padding, etc)
+      new Field("tOid", tOid, 32))
 }
 

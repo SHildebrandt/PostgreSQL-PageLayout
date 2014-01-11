@@ -60,8 +60,8 @@ class Page(val db: Database, val table: String, val pageNo: Int) {
     val pageSize = pageHeaderData.pagesize.value
     val otherElements = heapPageItems flatMap {hpi =>
       // we have to build "backwards" here to set the pointers
-      val item = Item(hpi.firstByte + DATA_HEADER_SIZE, hpi.lastByte, hpi)
-      val itemHeader = ItemHeader(hpi.firstByte, hpi.firstByte + DATA_HEADER_SIZE - 1, item)
+      val item = Item(hpi.itemDataStart, hpi.itemDataEnd, hpi)
+      val itemHeader = ItemHeader(hpi.itemHeaderStart, hpi.itemHeaderEnd, item)
       val itemIdData = ItemIdData(hpi.itemIdDataStart, hpi.itemIdDataEnd, itemHeader)
       List(itemIdData, itemHeader, item)
     }
@@ -115,7 +115,7 @@ object Page {
 
   val ITEM_ID_DATA_START = 24 // byte number on page
 
-  val DATA_HEADER_SIZE = 23 // bytes
+  val DATA_HEADER_FIXED_SIZE = 23 // in bytes, length of fixed part of tuple headers, does not include null bitmaps, padding, etc.
 
   def getVisualisationsOfAllPages(db: Database, table: String, layout: LayoutProperties): List[PageVisualization] = {
     def visOfPage(pageNo: Int): Try[PageVisualization] = {

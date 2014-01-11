@@ -12,3 +12,6 @@ project/plugins/project/
 # Intellij
 *.iml
 .idea/
+
+# output files
+output/*
