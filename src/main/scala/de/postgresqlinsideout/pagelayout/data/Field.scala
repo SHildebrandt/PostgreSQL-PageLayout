@@ -30,7 +30,7 @@ package de.postgresqlinsideout.pagelayout.data
  *
  * @author Steffen Hildebrandt
  */
-class Field[T](val name: String, val value: T, val size: Int) {
+class Field[T](val name: String, val value: T, val size: Int, val description: String = "") {
 
   override def toString = s"$name=$value"
 

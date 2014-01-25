@@ -26,6 +26,7 @@
 package de.postgresqlinsideout.pagelayout.data
 
 import scala.slick.session.Database
+import scala.collection.immutable.IndexedSeq
 
 
 /**
@@ -38,13 +39,13 @@ import scala.slick.session.Database
  * @param lpLen byte length of tuple
  * @param tXmin inserting xact ID
  * @param tXmax deleting or locking xact ID
- * @param tField3 two fields:
+ * @param tField3 one of two fields (depending on the state of the item)
  *                - t_cid   inserting or deleting command ID, or both
  *                - t_xvac  old-style VACUUM FULL xact ID
  * @param tCtid current TID of this or newer tuple
  * @param tInfomask2 number of attributes + various flags
  * @param tInfomask various flag bits
- * @param tHoff sizeof header incl. bitmap, oid, padding
+ * @param tHoff size of header incl. bitmap, oid, padding
  * @param tBits bitmap of NULLs -- variable length
  * @param tOid object id
  *
@@ -52,7 +53,7 @@ import scala.slick.session.Database
  */
 class HeapPageItemData(val lp: Field[Int], val lpOff: Field[Int], val lpFlags: Field[Int], val lpLen: Field[Int],
                    val tXmin: Field[Int], val tXmax: Field[Int], val tField3: Field[Int], val tCtid: Field[(Int, Int)],
-                   val tInfomask2: Field[Int], val tInfomask: Field[Int], val tHoff: Field[Int], val tBits: Field[String],
+                   val tInfomask2: Field[String], val tInfomask: Field[String], val tHoff: Field[Int], val tBits: Field[String],
                    val tOid: Field[Int])
   extends FieldList {
 
@@ -65,8 +66,10 @@ class HeapPageItemData(val lp: Field[Int], val lpOff: Field[Int], val lpFlags: F
   var fromDB: Option[Database] = None
   var fromTable: Option[String] = None
 
-  def toList() = List(lp, lpOff, lpFlags, lpLen, tXmin, tXmax, tField3,
-    tCtid, tInfomask2, tInfomask, tHoff, tBits, tOid)
+  lazy val lpList = List(lp, lpOff, lpFlags, lpLen)
+  lazy val headerDataList = List(tXmin, tXmax, tField3, tCtid, tInfomask2, tInfomask, tHoff, tBits, tOid)
+
+  override def toList() = lpList ++ headerDataList
 
   override def toString() = "HeapPageItem" + itemString
 
@@ -87,18 +90,22 @@ object HeapPageItemData {
   def apply(lp: Int, lpOff: Int, lpFlags: Int, lpLen: Int, tXmin: Int, tXmax: Int, tField3: Int, tCtid: (Int, Int),
             tInfomask2: Int, tInfomask: Int, tHoff: Int, tBits: String, tOid: Int) =
     new HeapPageItemData(
-      new Field("lp", lp, 0),
-      new Field("lpOff", lpOff, 2), // 15 bit
-      new Field("lpFlags", lpFlags, 0), //  2 bit
-      new Field("lpLen", lpLen, 2), // 15 bit
-      new Field("tXmin", tXmin, 4),
-      new Field("tXmax", tXmax, 4),
-      new Field("tField3", tField3, 4),
-      new Field("tCtid", tCtid, 6),
-      new Field("tInfomask2", tInfomask2, 2),
-      new Field("tInfomask", tInfomask, 2),
-      new Field("tHoff", tHoff, 1),
-      new Field("tBits", tBits, -1), // undefined length (depending on number of fields, padding, etc)
-      new Field("tOid", tOid, 32))
+      new Field("lp", lp, 0, "Implicit sequence number of this item pointer (is not stored in the page but created on-the-fly by the getHeapPageItems-function)"),
+      new Field("lpOff", lpOff, 2, "Byte offset to tuple (from start of page)"), // 15 bit
+      new Field("lpFlags", lpFlags, 0, "State of the item pointer (1 or 2 = alive)"), //  2 bit
+      new Field("lpLen", lpLen, 2, "Byte length of tuple"), // 15 bit
+      new Field("tXmin", tXmin, 4, "Inserting xact ID"),
+      new Field("tXmax", tXmax, 4, "Deleting or locking xact ID"),
+      new Field("tField3", tField3, 4, "During insert/delete operations: Command IDs cmin/cmax,  Otherwise: old-style VACUUM FULL xact ID"),
+      new Field("tCtid", tCtid, 6, "Current TID of this or newer tuple"),
+      new Field("tInfomask2", bitString(tInfomask2), 2, "Various flag bits"),
+      new Field("tInfomask", bitString(tInfomask), 2, "Various flag bits"),
+      new Field("tHoff", tHoff, 1, "Size of header incl. bitmap, oid, padding"),
+      new Field("tBits", tBits, -1, "Bitmap of NULLs -- variable length"), // undefined length (depending on number of fields, padding, etc)
+      new Field("tOid", tOid, 4, "Object ID"))
+
+  def bitString(n: Int) = {
+    (0 to 15) map (i => if (((1 << i) & n) > 0) "1" else "0") mkString ""
+  }
 }
 

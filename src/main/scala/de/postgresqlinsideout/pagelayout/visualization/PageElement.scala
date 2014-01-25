@@ -25,7 +25,7 @@
 
 package de.postgresqlinsideout.pagelayout.visualization
 
-import de.postgresqlinsideout.pagelayout.data.{DBAccess, PageHeaderData, HeapPageItemData}
+import de.postgresqlinsideout.pagelayout.data.{Field, DBAccess, PageHeaderData, HeapPageItemData}
 
 /**
  * An element within a page.
@@ -37,6 +37,7 @@ sealed trait PageElement {
   val firstByte: Int
   val lastByte: Int
   val content: String
+  val structuredContent: List[Detail]
 
   /**
    * Content of this PageElement if in the following rows (if it reaches until there)
@@ -48,12 +49,13 @@ sealed trait PageElement {
    */
   def title = content
 
-  val name: String = "id" + firstByte.toString
+  val id: String = "id" + firstByte.toString
   val tdClass: String
 }
 
 case class PageHeader(firstByte: Int, lastByte: Int, pageHeaderData: PageHeaderData) extends PageElement {
   val content = "PageHeader"
+  lazy val structuredContent = pageHeaderData.toList map (Detail.fromField(_))
   override def title = pageHeaderData.toString
   val contentContinued = ""
   val tdClass = "pageheader"
@@ -61,6 +63,7 @@ case class PageHeader(firstByte: Int, lastByte: Int, pageHeaderData: PageHeaderD
 
 case class ItemIdData(firstByte: Int, lastByte: Int, itemHeader: ItemHeader) extends PageElement {
   val content = s"--> ${itemHeader.firstByte}"
+  lazy val structuredContent = itemHeader.item.heapPageItem.lpList drop 1 map (Detail.fromField(_))
   override def title = s"Pointer to Byte ${itemHeader.firstByte}"
   val contentContinued = ""
   val tdClass = "itemiddata"
@@ -68,6 +71,7 @@ case class ItemIdData(firstByte: Int, lastByte: Int, itemHeader: ItemHeader) ext
 
 case class ItemHeader(firstByte: Int, lastByte: Int, item: Item) extends PageElement {
   val content = "ItemHeader"
+  lazy val structuredContent = item.heapPageItem.headerDataList map (Detail.fromField(_))
   override def title = item.heapPageItem.toString
   val contentContinued = ""
   val tdClass = "itemheader"
@@ -76,10 +80,13 @@ case class ItemHeader(firstByte: Int, lastByte: Int, item: Item) extends PageEle
 case class Item(firstByte: Int, lastByte: Int, heapPageItem: HeapPageItemData) extends PageElement {
   val db = heapPageItem.fromDB
   val table = heapPageItem.fromTable
-  lazy val content = (db, table) match {
-    case (Some(d), Some(t)) => s"${DBAccess.getContentForCtid(d, t, heapPageItem.tCtid.value) mkString " , "}"
-    case _ => s"Item with ctid = ${heapPageItem.tCtid.value}"
+  lazy val (columns, columnContent) = (db, table) match {
+    case (Some(d), Some(t)) => (DBAccess.getColumnNames(d, t), DBAccess.getContentForCtid(d, t, heapPageItem.tCtid.value))
+    case _ => (List(""), List(s"Item with ctid = ${heapPageItem.tCtid.value}"))
   }
+
+  lazy val content = columnContent mkString ","
+  lazy val structuredContent = columns zip columnContent map (c => Detail(c._1, c._2, None))
   val contentContinued = "..."
   val tdClass = "item"
 }
@@ -87,6 +94,7 @@ case class Item(firstByte: Int, lastByte: Int, heapPageItem: HeapPageItemData) e
 case class Empty(firstByte: Int, lastByte: Int) extends PageElement {
   val content = ""
   val contentContinued = ""
+  val structuredContent = List.empty
   override val title = "Empty Space"
   val tdClass = "empty"
 }
@@ -97,10 +105,17 @@ case class Empty(firstByte: Int, lastByte: Int) extends PageElement {
 case class Ignored(firstByte: Int, lastByte: Int) extends PageElement {
   val content = ""
   val contentContinued = ""
+  val structuredContent = List.empty
   override val title = "Page content ignored for visualization"
   val tdClass = "ignored"
 }
 
 object PageElement {
   val ordering: Ordering[PageElement] = Ordering[Int].on[PageElement](t => t.firstByte)
+}
+
+case class Detail(name: String, value: String, description: Option[String])
+
+object Detail {
+  def fromField(f: Field[_]) =  Detail(f.name, if (f.value == null) "" else f.value.toString, Some(f.description))
 }

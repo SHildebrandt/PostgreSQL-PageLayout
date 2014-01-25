@@ -29,7 +29,7 @@ package de.postgresqlinsideout.pagelayout.data
  * Representation of a page header in PostgreSQL
  * (as described in the PostgreSQL source code)
  *
- * @param lsn next byte after last byte of xlog record for last change to this page
+ * @param lsn Xlog record for last change to this page
  * @param checksum page checksum, if set
  * @param flags flag bits
  * @param lower offset to start of free space
@@ -55,13 +55,13 @@ object PageHeaderData {
   def apply(lsn: String, checksum: Int, flags: Int, lower: Int, upper: Int, special: Int,
             pagesize: Int, version: Int, pruneXid: Int) =
     new PageHeaderData(
-      new Field("lsn", lsn, 8),
-      new Field("checksum", checksum, 2),
-      new Field("flags", flags, 2),
-      new Field("lower", lower, 2),
-      new Field("upper", upper, 2),
-      new Field("special", special, 2),
-      new Field("pagesize", pagesize, 1),
-      new Field("version", version, 1),
-      new Field("pruneXid", pruneXid, 4))
+      new Field("lsn", lsn, 8, "Xlog record for last change to this page"),
+      new Field("checksum", checksum, 2, "Page checksum, if set"),
+      new Field("flags", flags, 2, "Flag bits"),
+      new Field("lower", lower, 2, "Offset to start of free space"),
+      new Field("upper", upper, 2, "Offset to end of free space"),
+      new Field("special", special, 2, "Offset to start of special space"),
+      new Field("pagesize", pagesize, 1, "Page size in bytes (will always be the same within a database)"),
+      new Field("version", version, 1, "Page layout version number"),
+      new Field("pruneXid", pruneXid, 4, "Oldest XID among potentially prunable tuples on page"))
 }

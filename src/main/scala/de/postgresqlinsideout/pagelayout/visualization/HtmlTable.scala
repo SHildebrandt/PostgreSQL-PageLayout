@@ -80,16 +80,17 @@ class HtmlTable(page: Page, layout: LayoutProperties) extends PageVisualization(
     def tr = writer.println("    <tr>")
     def `/tr` = writer.println("    </tr>")
     def td(name: String, clazz: String = "", colspan: Int = 1, title: String = "", mouseover: String = "") =
-      writer.print(s"      <td class='$clazz' name='$name' colspan=$colspan title='$title' $mouseover><div class='td'>")
-    def `/td` = writer.println("</div></td>")
+      writer.print(s"      <td class='content $clazz' name='$name' colspan=$colspan title='$title' $mouseover>" +
+        "<div class='td' style=\"cursor: pointer;\" onclick=\"window.location='#" + name + "';\">")
+    def `/td` = writer.println("</div></a></td>")
 
     def cell(colspan: Int, element: PageElement, useContinuedContent: Boolean) = {
       val mouseover = element match {
-        case ItemIdData(_, _, h) => emphasize(h.name)
+        case ItemIdData(_, _, h) => emphasize(h.id)
         case _ => ""
       }
       val title = s"Start Byte = ${element.firstByte}, Length = ${element.lastByte - element.firstByte + 1}\n${element.title}"
-      td(element.name, element.tdClass, colspan, title, mouseover)
+      td(element.id, element.tdClass, colspan, title, mouseover)
       if (!useContinuedContent)
         writer.print(element.content)
       else
@@ -118,7 +119,7 @@ class HtmlTable(page: Page, layout: LayoutProperties) extends PageVisualization(
     def leftOutRows(element: PageElement) = {
       tr
       val title = s"Start Byte = ${element.firstByte}, Length = ${element.lastByte - element.firstByte + 1}\n${element.title}"
-      writer.print(s"      <td name=${element.name} class='${element.tdClass} leftOutRows' colspan=$COLUMNS title='(rows compressed)\n$title'></td>")
+      writer.print(s"      <td name=${element.id} class='${element.tdClass} leftOutRows' colspan=$COLUMNS title='(rows compressed)\n$title'></td>")
       `/tr`
     }
 
@@ -154,13 +155,36 @@ class HtmlTable(page: Page, layout: LayoutProperties) extends PageVisualization(
       }
     }
 
+    def contentDetails(element: PageElement) {
+      writer.println(s"<div id='${element.id}' class='modal'>" + "<div style=\"cursor: pointer;\" onclick=\"window.location='';\">")
+      if (element.structuredContent.nonEmpty) {
+        writer.println(modalTableHead)
+        element.structuredContent.foreach(detail => {
+          tr
+          writer.println(s"      <td>${detail.name}</td>")
+          writer.println(s"      <td>${detail.value}</td>")
+          writer.println(s"      <td>${detail.description.getOrElse("")}</td>")
+          `/tr`
+        })
+        writer.println(tableEnd)
+      } else {
+        writer.println("<p>Well, I guess there's nothing more to say... It's just Empty Space!</p>")
+      }
+      writer.println("</span></a></div></div>")
+    }
+
     writer.println(htmlHead)
     writer.println(header)
+    writer.println(bodyStart)
+    contents.foreach(element => {
+      contentDetails(element)
+    })
     writer.println(tableHead(pageTitle, pageSubtitle, page.columnNames))
     contents.foreach(element => {
       content(endPos(element), element)
     })
     writer.println(tableEnd)
+    writer.println(bodyEnd)
     writer.println(htmlEnd)
     writer.close()
   }

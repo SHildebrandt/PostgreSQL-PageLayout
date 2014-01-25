@@ -88,20 +88,31 @@ trait LayoutProperties {
                   |</script>
                   |</head>""".stripMargin
 
+  def bodyStart = "<body>"
+
   def tableHead(pageTitle: String, pageSubTitle: Option[String], columnNames: List[String]) = {
-    val body = "<body>\n"
     val title = s"  <h1>$pageTitle</h1>\n"
     val subtitle = if (!pageSubTitle.isDefined) "" else s"  <h2>${pageSubTitle.get}</h2>\n"
-    val columnDescription = s"  <h3>Column Names: ${columnNames.mkString(", ")}</h3>\n"
+    val columnDescription = "" // s"  <h3>Column Names: ${columnNames.mkString(", ")}</h3>\n"
     val table = "  <table class='center'>\n"
     val cols = (1 to COLUMNS) map (_ => s"    <col class='fixedWidth'/>") mkString "\n"
-    body + title + subtitle + columnDescription + table + cols
+    title + subtitle + columnDescription + table + cols
   }
 
-  def tableEnd = "  </table>\n</body>"
+  def tableEnd = "  </table>"
+
+  def bodyEnd = "</body>"
 
   def htmlEnd = "</html>"
 
   def emphasize(name: String) = // escaping quotes in String interpolations doesn't work.....
     s"onmouseover=${'"'}$EMPHASIZE_FUNCTION_NAME('$name')${'"'} onmouseout=${'"'}$UNEMPHASIZE_FUNCTION_NAME('$name')${'"'}"
+
+  def modalTableHead =
+    """  <table>
+      |    <tr>
+      |      <th>Field</th>
+      |      <th>Value</th>
+      |      <th>Description</th>
+      |    </tr>""".stripMargin
 }

@@ -10,7 +10,7 @@ table.center {
   margin: 0 auto;
 }
 
-td {
+td.content {
   border:1px solid black;
   padding-top: 2px;
   padding-bottom: 1px;
@@ -21,25 +21,26 @@ td {
 }
 
 td.empty {
-  background-color:gray;
+  background-color:#999999;
 }
 
 td.item {
-  background-color:red;
-  color: whitesmoke;
+  background-color:#FF1B1B;
+  color:whitesmoke;
 }
 
 td.pageheader {
-  background-color:orange;
+  background-color:#009900;
+  color:gold;
 }
 
 td.itemheader {
-  background-color:yellow;
+  background-color:#EEEE00;
 }
 
 td.itemiddata {
-  background-color:green;
-  color: gold;
+  background-color:#5555FF;
+  color:black;
 }
 
 td.leftOutRows {
@@ -62,4 +63,48 @@ td.ignored {
 
 div.td {
   height:20px;
+}
+
+.modal {
+	position: fixed;
+	font-family: Arial, Helvetica, sans-serif;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background: rgba(0,0,0,0.8);
+	z-index: 99999;
+	opacity:0;
+	-webkit-transition: opacity 400ms ease-in;
+	-moz-transition: opacity 400ms ease-in;
+	transition: opacity 400ms ease-in;
+	pointer-events: none; 
+}
+
+.modal:target {
+	opacity:1;
+	pointer-events: auto;
+}
+
+.modal > div {
+	/*width:400px;*/
+    float: left;
+	position: relative; 
+	margin: 0 auto;
+	padding: 5px 20px 13px 20px;
+	border-radius: 10px;
+	background: #fff;
+	background: -moz-linear-gradient(#fff, #999);
+	background: -webkit-linear-gradient(#fff, #999);
+	background: -o-linear-gradient(#fff, #999);
+}
+
+.modal table {
+  border-collapse: separate; 
+  border-spacing: 15px 5px;
+  margin: 0 auto;
+}
+
+.modal th {
+  text-align: left;
 }
