@@ -6,7 +6,10 @@ libraryDependencies ++= Seq(
   "com.typesafe.slick" %% "slick" % "1.0.1",
   "org.postgresql" % "postgresql" % "9.3-1100-jdbc4",
   "org.slf4j" % "slf4j-simple" % "1.7.5",
-  "com.github.scopt" %% "scopt" % "3.2.0"
+  "com.github.scopt" %% "scopt" % "3.2.0",
+  "commons-lang" % "commons-lang" % "2.6"
 )
+
+seq(com.github.retronym.SbtOneJar.oneJarSettings: _*)
 
 resolvers += Resolver.sonatypeRepo("public")
