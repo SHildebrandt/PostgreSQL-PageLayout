@@ -82,7 +82,7 @@ class HtmlTable(page: Page, layout: LayoutProperties) extends PageVisualization(
     def td(name: String, clazz: String = "", colspan: Int = 1, title: String = "", mouseover: String = "") =
       writer.print(s"      <td class='content $clazz' name='$name' colspan=$colspan title='$title' $mouseover>" +
         "<div class='td' style=\"cursor: pointer;\" onclick=\"window.location='#" + name + "';\">")
-    def `/td` = writer.println("</div></a></td>")
+    def `/td` = writer.println("</div></td>")
 
     def cell(colspan: Int, element: PageElement, useContinuedContent: Boolean) = {
       val mouseover = element match {
@@ -170,7 +170,7 @@ class HtmlTable(page: Page, layout: LayoutProperties) extends PageVisualization(
       } else {
         writer.println("<p>Well, I guess there's nothing more to say... It's just Empty Space!</p>")
       }
-      writer.println("</span></a></div></div>")
+      writer.println("</div></div>")
     }
 
     writer.println(htmlHead)

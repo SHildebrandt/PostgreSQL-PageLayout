@@ -74,7 +74,7 @@ trait LayoutProperties {
   def header = s"""<head>
                   |<title>PostgreSQL PageLayout</title>
                   |$style
-                  |<script language="javascript" type="text/javascript">
+                  |<script type="text/javascript">
                   |function $EMPHASIZE_FUNCTION_NAME(name) {
                   |   var elems = document.getElementsByName(name);
                   |   for (var i = 0; i < elems.length; i++)
