@@ -143,7 +143,7 @@ class HtmlTable(page: Page, layout: LayoutProperties) extends PageVisualization(
 
         if (contentInNextRow && contentRows > 2)
           cellUntil(COLUMNS, element, false)
-        if (leaveOutRows)
+        if (leaveOutRows || element.isInstanceOf[Ignored])
           leftOutRows(element)
         else
           rowsUntil(row, element)
@@ -157,6 +157,7 @@ class HtmlTable(page: Page, layout: LayoutProperties) extends PageVisualization(
 
     def contentDetails(element: PageElement) {
       writer.println(s"<div id='${element.id}' class='modal'>" + "<div style=\"cursor: pointer;\" onclick=\"window.location='';\">")
+      writer.println(s"<p>Start Byte = ${element.firstByte}, Length = ${element.lastByte - element.firstByte + 1} bytes</p>")
       if (element.structuredContent.nonEmpty) {
         writer.println(modalTableHead)
         element.structuredContent.foreach(detail => {
@@ -168,7 +169,11 @@ class HtmlTable(page: Page, layout: LayoutProperties) extends PageVisualization(
         })
         writer.println(tableEnd)
       } else {
-        writer.println("<p>Well, I guess there's nothing more to say... It's just Empty Space!</p>")
+        element match {
+          case _: Ignored => writer.println("<p>The creator of this visualization decided to ignore this page range to keep it compact.</p>")
+          case _: Empty   => writer.println("<p>Well, I guess there's nothing more to say... It's just Empty Space!</p>")
+          case _ => writer.println("<p>Sorry, no idea what to say about that...</p>")
+        }
       }
       writer.println("</div></div>")
     }
