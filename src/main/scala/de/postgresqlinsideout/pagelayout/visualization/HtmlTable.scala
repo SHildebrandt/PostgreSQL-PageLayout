@@ -43,9 +43,9 @@ class HtmlTable(page: Page, layout: LayoutProperties) extends PageVisualization(
   def pageTitle = s"Visualization of Page $pageNo in Table $table"
   def pageSubtitle: Option[String] = query map ("under the condition '" + _ + "'")
 
-  /** elements sorted and optionally ingnored range excluded (if IGNORED_BYTE_RANGE != None)*/
-  lazy val contents: SortedSet[PageElement] = {
-    val sorted = SortedSet[PageElement](elements:_*)(PageElement.ordering)
+  /** elements sorted and optionally ignored range excluded (if IGNORED_BYTE_RANGE != None) */
+  lazy val contents: List[PageElement] = {
+    val sorted = List[PageElement](elements:_*).sorted(PageElement.ordering)
 
     IGNORED_BYTE_RANGE match {
       case None => sorted
@@ -55,7 +55,7 @@ class HtmlTable(page: Page, layout: LayoutProperties) extends PageVisualization(
         if (COMPRESS_INNER_ROWS && firstElem.lastByte >= lastElem.firstByte - 1) // firstElem and lastElem equal or next to each other
           sorted // don't need to cut out just one or two elements, since they will be compressed at any rate
         else
-          (sorted filter (e => e.lastByte < start || e.firstByte > end)) + Ignored(firstElem.firstByte, lastElem.lastByte)
+          Ignored(firstElem.firstByte, lastElem.lastByte) :: (sorted filter (e => e.lastByte < start || e.firstByte > end)) sorted (PageElement.ordering)
     }
   }
 
@@ -86,7 +86,7 @@ class HtmlTable(page: Page, layout: LayoutProperties) extends PageVisualization(
 
     def cell(colspan: Int, element: PageElement, useContinuedContent: Boolean) = {
       val mouseover = element match {
-        case ItemIdData(_, _, h) => emphasize(h.id)
+        case ItemIdData(_, _, h) if h.item.heapPageItem.lpFlags.value != 0 => emphasize(h.id) // don't emphasize if itempointer is dead
         case _ => ""
       }
       val title = s"Start Byte = ${element.firstByte}, Length = ${element.lastByte - element.firstByte + 1}\n${element.title}"
@@ -124,11 +124,10 @@ class HtmlTable(page: Page, layout: LayoutProperties) extends PageVisualization(
     }
 
     def content(endPos: Pos, element: PageElement) = {
-      val row = endPos._1
-      val col = endPos._2
+      val (row, col) = endPos
       val contentRows = row - currentRow + 1
       if (contentRows == 1)
-      cellUntil(col, element)
+        cellUntil(col, element)
       else if (contentRows > 1) {
         val contentInNextRow =
           element.content.size > 0 &&
@@ -172,6 +171,7 @@ class HtmlTable(page: Page, layout: LayoutProperties) extends PageVisualization(
         element match {
           case _: Ignored => writer.println("<p>The creator of this visualization decided to ignore this page range to keep it compact.</p>")
           case _: Empty   => writer.println("<p>Well, I guess there's nothing more to say... It's just Empty Space!</p>")
+          case i: Item if i.mightBeDead => writer.println("<p>This item seems to be dead, it will be removed by the next VACUUM operation.</p>")
           case _ => writer.println("<p>Sorry, no idea what to say about that...</p>")
         }
       }

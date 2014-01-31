@@ -65,12 +65,16 @@ object DBAccess {
 
   implicit val getCtidsResult = GetResult(r => stringToIntTupel(r.<<[String]))
 
-  def stringToIntTupel(s: String): (Int, Int) = {
-    val start = s.indexOf("(")
-    val end = s.indexOf(")")
-    s.substring(start + 1, end).split(",").toList match {
-      case a :: b :: Nil => (a.toInt, b.toInt)
-      case _ => throw new Exception("Could not parse Int-Tuple: " + s)
+  def stringToIntTupel(s: String): Option[(Int, Int)] = {
+    if (s == null)
+      None
+    else {
+      val start = s.indexOf("(")
+      val end = s.indexOf(")")
+      s.substring(start + 1, end).split(",").toList match {
+        case a :: b :: Nil => Some(a.toInt, b.toInt)
+        case _ => throw new Exception("Could not parse Int-Tuple: " + s)
+      }
     }
   }
 

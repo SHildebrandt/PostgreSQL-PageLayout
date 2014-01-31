@@ -29,6 +29,10 @@ td.item {
   color:whitesmoke;
 }
 
+td.deadItem {
+	background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFklEQVQIHWNkYGD4/19aGkhKS/8HcQAsxwVpE3uHywAAAABJRU5ErkJggg==)
+}
+
 td.pageheader {
   background-color:#009900;
   color:gold;

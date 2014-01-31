@@ -63,7 +63,10 @@ class Page(val db: Database, val table: String, val pageNo: Int) {
       val item = Item(hpi.itemDataStart, hpi.itemDataEnd, hpi)
       val itemHeader = ItemHeader(hpi.itemHeaderStart, hpi.itemHeaderEnd, item)
       val itemIdData = ItemIdData(hpi.itemIdDataStart, hpi.itemIdDataEnd, itemHeader)
-      List(itemIdData, itemHeader, item)
+      if (hpi.tCtid.value == None)
+        List(itemIdData) // ctid == None means that item does not exist (state of itempointer should be 0)
+      else
+        List(itemIdData, itemHeader, item)
     }
     val content = pageHeader :: otherElements
     val empty = getEmptySpace(content, pageSize)
@@ -91,7 +94,7 @@ class Page(val db: Database, val table: String, val pageNo: Int) {
   }
 
   def getEmptySpace(allNonEmptyElements: List[PageElement], tableSize: Int): List[PageElement] = {
-    val sorted = SortedSet[PageElement](allNonEmptyElements:_*)(PageElement.ordering)
+    val sorted = List[PageElement](allNonEmptyElements:_*).sorted(PageElement.ordering)
     val it = (sorted map (e => (e.firstByte, e.lastByte))).iterator
 
     val empty = ListBuffer[Empty]()

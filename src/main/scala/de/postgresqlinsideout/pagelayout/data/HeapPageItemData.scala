@@ -26,7 +26,6 @@
 package de.postgresqlinsideout.pagelayout.data
 
 import scala.slick.session.Database
-import scala.collection.immutable.IndexedSeq
 
 
 /**
@@ -52,10 +51,10 @@ import scala.collection.immutable.IndexedSeq
  * @author Steffen Hildebrandt
  */
 class HeapPageItemData(val lp: Field[Int], val lpOff: Field[Int], val lpFlags: Field[Int], val lpLen: Field[Int],
-                   val tXmin: Field[Int], val tXmax: Field[Int], val tField3: Field[Int], val tCtid: Field[(Int, Int)],
-                   val tInfomask2: Field[String], val tInfomask: Field[String], val tHoff: Field[Int], val tBits: Field[String],
-                   val tOid: Field[Int])
-  extends FieldList {
+                       val tXmin: Field[Int], val tXmax: Field[Int], val tField3: Field[Int], val tCtid: Field[Option[(Int, Int)]],
+                       val tInfomask2: Field[String], val tInfomask: Field[String], val tHoff: Field[Int], val tBits: Field[String],
+                       val tOid: Field[Int])
+        extends FieldList {
 
   /**
    * This is a var, not a val.
@@ -87,7 +86,7 @@ class HeapPageItemData(val lp: Field[Int], val lpOff: Field[Int], val lpFlags: F
 
 object HeapPageItemData {
 
-  def apply(lp: Int, lpOff: Int, lpFlags: Int, lpLen: Int, tXmin: Int, tXmax: Int, tField3: Int, tCtid: (Int, Int),
+  def apply(lp: Int, lpOff: Int, lpFlags: Int, lpLen: Int, tXmin: Int, tXmax: Int, tField3: Int, tCtid: Option[(Int, Int)],
             tInfomask2: Int, tInfomask: Int, tHoff: Int, tBits: String, tOid: Int) =
     new HeapPageItemData(
       new Field("lp", lp, 0, "Implicit sequence number of this item pointer (is not stored in the page but created on-the-fly by the getHeapPageItems-function)"),
@@ -97,7 +96,10 @@ object HeapPageItemData {
       new Field("tXmin", tXmin, 4, "Inserting xact ID"),
       new Field("tXmax", tXmax, 4, "Deleting or locking xact ID"),
       new Field("tField3", tField3, 4, "During insert/delete operations: Command IDs cmin/cmax,  Otherwise: old-style VACUUM FULL xact ID"),
-      new Field("tCtid", tCtid, 6, "Current TID of this or newer tuple"),
+      new Field("tCtid", tCtid, 6, "fdsafsaCurrent TID of this or newer tuple") {
+        override def valueToString = value.getOrElse("").toString
+        override def toString = s"$name=${value.getOrElse("")}"
+      },
       new Field("tInfomask2", bitString(tInfomask2), 2, "Various flag bits"),
       new Field("tInfomask", bitString(tInfomask), 2, "Various flag bits"),
       new Field("tHoff", tHoff, 1, "Size of header incl. bitmap, oid, padding"),

@@ -32,13 +32,14 @@ package de.postgresqlinsideout.pagelayout.data
  */
 class Field[T](val name: String, val value: T, val size: Int, val description: String = "") {
 
-  override def toString = s"$name=$value"
+  def valueToString = value.toString
 
+  override def toString = s"$name=$value"
 }
 
 abstract class FieldList {
 
   def toList(): List[Field[_]]
 
-  def itemString = "(" + (this.toList map (f => s"${f.name}=${f.value}") mkString " , ") + ")"
+  def itemString = "(" + (this.toList map (f => f.toString) mkString " , ") + ")"
 }
