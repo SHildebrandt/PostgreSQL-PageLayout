@@ -62,7 +62,7 @@ case class PageHeader(firstByte: Int, lastByte: Int, pageHeaderData: PageHeaderD
 }
 
 case class ItemIdData(firstByte: Int, lastByte: Int, itemHeader: ItemHeader) extends PageElement {
-  val content = s"--> ${itemHeader.firstByte}"
+  val content = s"&#8594; ${itemHeader.firstByte}" // &#8594; is an right arrow (-->)
   lazy val structuredContent = itemHeader.item.heapPageItem.lpList drop 1 map (Detail.fromField(_))
   override def title = s"Pointer to Byte ${itemHeader.firstByte}"
   val contentContinued = ""

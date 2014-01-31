@@ -122,7 +122,7 @@ object DBAccess {
   }
 
   def getContentForCtid(db: Database, table: String, ctid: (Int, Int)): List[String] = db withSession {
-    StaticQuery.queryNA[List[String]](s"SELECT * FROM $table WHERE ctid = '$ctid'").list.head
+    StaticQuery.queryNA[List[String]](s"SELECT * FROM $table WHERE ctid = '$ctid'").list.headOption.getOrElse(List())
   }
 
   def getPageHeaderString(db: Database, table: String, pageNo: Int): List[String] = db withSession {
