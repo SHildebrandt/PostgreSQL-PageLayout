@@ -96,7 +96,7 @@ object HeapPageItemData {
       new Field("tXmin", tXmin, 4, "Inserting xact ID"),
       new Field("tXmax", tXmax, 4, "Deleting or locking xact ID"),
       new Field("tField3", tField3, 4, "During insert/delete operations: Command IDs cmin/cmax,  Otherwise: old-style VACUUM FULL xact ID"),
-      new Field("tCtid", tCtid, 6, "fdsafsaCurrent TID of this or newer tuple") {
+      new Field("tCtid", tCtid, 6, "Current TID of this or newer tuple") {
         override def valueToString = value.getOrElse("").toString
         override def toString = s"$name=${value.getOrElse("")}"
       },
